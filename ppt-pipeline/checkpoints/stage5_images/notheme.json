@@ -1,0 +1,19 @@
+{
+  "filename": "notheme",
+  "slide_count": 11,
+  "output_dir": "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme",
+  "method": "PowerPoint COM",
+  "images": [
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_01.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_02.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_03.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_04.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_05.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_06.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_07.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_08.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_09.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_10.png",
+    "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage5_images\\notheme\\slide_11.png"
+  ]
+}

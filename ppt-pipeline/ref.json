@@ -1,0 +1,400 @@
+{
+  "size": [
+    10.0,
+    5.625
+  ],
+  "slides": [
+    {
+      "num": 1,
+      "layout": "SECTION_HEADER",
+      "shapes": [
+        {
+          "name": "Google Shape;89;p1",
+          "ph": 0,
+          "l": 1.37,
+          "t": 2.032,
+          "w": 7.26,
+          "h": 1.435,
+          "text": "Introduction to Agents",
+          "font_size": 50.0,
+          "bold": true
+        }
+      ]
+    },
+    {
+      "num": 2,
+      "layout": "TITLE",
+      "shapes": [
+        {
+          "name": "Google Shape;94;p2",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.467,
+          "w": 8.992,
+          "h": 0.917,
+          "text": "Agenda",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;95;p2",
+          "ph": 1,
+          "l": 0.297,
+          "t": 1.809,
+          "w": 9.212,
+          "h": 2.471,
+          "text": "The Shift: From Passive LLMs to Agentic AI\nDefining the Future: AI Agents vs. Agentic Systems\nThe Bl",
+          "font_size": 19.0,
+          "bold": null
+        },
+        {
+          "name": "Google Shape;96;p2",
+          "ph": null,
+          "l": 0.842,
+          "t": 4.421,
+          "w": 1.934,
+          "h": 0.738,
+          "text": "",
+          "font_size": null,
+          "bold": null
+        }
+      ]
+    },
+    {
+      "num": 3,
+      "layout": "TITLE_AND_BODY",
+      "shapes": [
+        {
+          "name": "Google Shape;101;p3",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.438,
+          "w": 9.318,
+          "h": 0.665,
+          "text": "Why Agentic AI?",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;102;p3",
+          "ph": 1,
+          "l": 0.341,
+          "t": 1.345,
+          "w": 9.318,
+          "h": 3.652,
+          "text": "LLMs evolving from passive tools to active agents\nAutonomous task orchestration\nNeed for memory, rea",
+          "font_size": 19.0,
+          "bold": null
+        }
+      ]
+    },
+    {
+      "num": 4,
+      "layout": "TITLE_AND_BODY",
+      "shapes": [
+        {
+          "name": "Google Shape;107;p4",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.459,
+          "w": 9.318,
+          "h": 0.665,
+          "text": "AI Agents vs Agentic AI",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;108;p4",
+          "ph": 1,
+          "l": 0.341,
+          "t": 1.345,
+          "w": 9.318,
+          "h": 3.652,
+          "text": "An AI Agent is an individual intelligent system that:\n Perceives → Decides → Acts to achieve a goal.",
+          "font_size": 14.0,
+          "bold": null
+        }
+      ]
+    },
+    {
+      "num": 5,
+      "layout": "TITLE_AND_BODY",
+      "shapes": [
+        {
+          "name": "Google Shape;113;p5",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.438,
+          "w": 9.318,
+          "h": 0.665,
+          "text": "Evolution of Agentic AI",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;114;p5",
+          "ph": null,
+          "l": 0.475,
+          "t": 1.444,
+          "w": 8.844,
+          "h": 2.826
+        },
+        {
+          "name": "Google Shape;115;p5",
+          "ph": 1,
+          "l": 0.341,
+          "t": 1.345,
+          "w": 9.318,
+          "h": 3.652,
+          "text": "",
+          "font_size": null,
+          "bold": null
+        }
+      ]
+    },
+    {
+      "num": 6,
+      "layout": "TITLE_AND_BODY",
+      "shapes": [
+        {
+          "name": "Google Shape;120;p6",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.469,
+          "w": 9.318,
+          "h": 0.665,
+          "text": "Reference Platform Architecture",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;121;p6",
+          "ph": 1,
+          "l": 0.16,
+          "t": 1.366,
+          "w": 9.014,
+          "h": 3.652,
+          "text": "\nPlanner: Decomposes goals into actions or chains-of-thought. Can be rule-based or LLM-based (chain-",
+          "font_size": null,
+          "bold": null
+        }
+      ]
+    },
+    {
+      "num": 7,
+      "layout": "SECTION_TITLE_AND_DESCRIPTION",
+      "shapes": [
+        {
+          "name": "Google Shape;126;p7",
+          "ph": null,
+          "l": 4.998,
+          "t": 1.363,
+          "w": 5.004,
+          "h": 3.117
+        },
+        {
+          "name": "Google Shape;127;p7",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.0,
+          "w": 4.424,
+          "h": 1.711,
+          "text": "The Agent-Tool Ecosystem",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;128;p7",
+          "ph": 2,
+          "l": 5.0,
+          "t": 1.31,
+          "w": 5.004,
+          "h": 3.223,
+          "text": "",
+          "font_size": null,
+          "bold": null
+        },
+        {
+          "name": "Google Shape;129;p7",
+          "ph": 1,
+          "l": 0.29,
+          "t": 1.848,
+          "w": 4.424,
+          "h": 3.265,
+          "text": "Orchestrating Intelligence and Action\nThe platform serves as the central \"nervous system\" that bridg",
+          "font_size": 15.0,
+          "bold": null
+        }
+      ]
+    },
+    {
+      "num": 8,
+      "layout": "SECTION_TITLE_AND_DESCRIPTION",
+      "shapes": [
+        {
+          "name": "Google Shape;134;p8",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.274,
+          "w": 4.424,
+          "h": 1.711,
+          "text": "Agent Patterns",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;135;p8",
+          "ph": 2,
+          "l": 5.402,
+          "t": 0.792,
+          "w": 4.196,
+          "h": 4.041,
+          "text": "",
+          "font_size": null,
+          "bold": null
+        },
+        {
+          "name": "Google Shape;136;p8",
+          "ph": 1,
+          "l": 0.0,
+          "t": 1.384,
+          "w": 5.01,
+          "h": 4.041,
+          "text": "Concurrent Pattern: Multiple agents work on the same input in parallel.\nGroup-chat Pattern: Agents a",
+          "font_size": 16.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;137;p8",
+          "ph": null,
+          "l": 5.01,
+          "t": 1.528,
+          "w": 4.99,
+          "h": 3.466
+        }
+      ]
+    },
+    {
+      "num": 9,
+      "layout": "SECTION_TITLE_AND_DESCRIPTION",
+      "shapes": [
+        {
+          "name": "Google Shape;142;p9",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.0,
+          "w": 4.424,
+          "h": 1.711,
+          "text": "Agent patterns contd., ",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;143;p9",
+          "ph": 2,
+          "l": 5.0,
+          "t": 1.231,
+          "w": 5.0,
+          "h": 3.602,
+          "text": "",
+          "font_size": null,
+          "bold": null
+        },
+        {
+          "name": "Google Shape;144;p9",
+          "ph": 1,
+          "l": 0.0,
+          "t": 1.532,
+          "w": 5.0,
+          "h": 4.041,
+          "text": "ReAct (Reason + Act): Combines reasoning (thoughts) with specific actions to solve a task. The agent",
+          "font_size": 11.8,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;145;p9",
+          "ph": null,
+          "l": 5.0,
+          "t": 1.363,
+          "w": 5.0,
+          "h": 3.602
+        }
+      ]
+    },
+    {
+      "num": 10,
+      "layout": "SECTION_TITLE_AND_DESCRIPTION",
+      "shapes": [
+        {
+          "name": "Google Shape;150;p10",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.0,
+          "w": 4.424,
+          "h": 1.711,
+          "text": "Agent Design",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;151;p10",
+          "ph": 2,
+          "l": 5.402,
+          "t": 0.792,
+          "w": 4.196,
+          "h": 4.041,
+          "text": "\n",
+          "font_size": null,
+          "bold": null
+        },
+        {
+          "name": "Google Shape;152;p10",
+          "ph": null,
+          "l": 5.0,
+          "t": 1.336,
+          "w": 5.0,
+          "h": 3.497
+        },
+        {
+          "name": "Google Shape;153;p10",
+          "ph": 1,
+          "l": 0.0,
+          "t": 1.015,
+          "w": 5.0,
+          "h": 4.61,
+          "text": "1. The Sensory Layer: Perception\nThe agent begins by receiving user input, environmental signals, or",
+          "font_size": 11.0,
+          "bold": true
+        }
+      ]
+    },
+    {
+      "num": 11,
+      "layout": "TITLE",
+      "shapes": [
+        {
+          "name": "Google Shape;158;p11",
+          "ph": 0,
+          "l": 0.0,
+          "t": 0.403,
+          "w": 8.992,
+          "h": 0.917,
+          "text": "Conclusion",
+          "font_size": 35.0,
+          "bold": true
+        },
+        {
+          "name": "Google Shape;159;p11",
+          "ph": 1,
+          "l": 0.717,
+          "t": 1.563,
+          "w": 8.275,
+          "h": 2.77,
+          "text": "Evolution: Agentic AI is about building ecosystems, not just individual tools.\nSystems Thinking: Suc",
+          "font_size": 16.0,
+          "bold": null
+        }
+      ]
+    }
+  ]
+}

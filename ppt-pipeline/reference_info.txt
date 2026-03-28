@@ -1,0 +1,141 @@
+Size: 10.0000 x 5.6250 inches
+Slides: 11
+Layouts: 11
+
+=== SLIDE 1 | layout: "SECTION_HEADER" ===
+  ph=0 name="Google Shape;89;p1" l=1.3701 t=2.0322 w=7.2598 h=1.435
+    text: Introduction to Agents
+    para0 run0: size=50.0pt bold=True color=None text=Introduction to Agents
+
+=== SLIDE 2 | layout: "TITLE" ===
+  ph=0 name="Google Shape;94;p2" l=0.0 t=0.4667 w=8.9918 h=0.9173
+    text: Agenda
+    para0 run0: size=35.0pt bold=True color=None text=Agenda
+  ph=1 name="Google Shape;95;p2" l=0.2971 t=1.8095 w=9.2119 h=2.4715
+    text: The Shift: From Passive LLMs to Agentic AI
+Defining the Future: AI Agents vs. Ag
+    para0 run0: size=19.0pt bold=None color=None text=The Shift: From Passive LLMs to Agentic 
+    para1 run0: size=19.0pt bold=None color=None text=Defining the Future: AI Agents vs. Agent
+    para2 run0: size=19.0pt bold=None color=None text=The Blueprint: Reference Platform Archit
+    para3 run0: size=19.0pt bold=None color=None text=Design Patterns: How Agents Collaborate 
+  ph=None name="Google Shape;96;p2" l=0.8415 t=4.4208 w=1.9344 h=0.7379
+    para0 run0: size=inhpt bold=None color=None text=
+
+=== SLIDE 3 | layout: "TITLE_AND_BODY" ===
+  ph=0 name="Google Shape;101;p3" l=0.0 t=0.4379 w=9.3182 h=0.6647
+    text: Why Agentic AI?
+    para0 run0: size=35.0pt bold=True color=None text=Why Agentic AI?
+  ph=1 name="Google Shape;102;p3" l=0.3409 t=1.345 w=9.3182 h=3.6516
+    text: LLMs evolving from passive tools to active agents
+Autonomous task orchestration
+
+    para0 run0: size=19.0pt bold=None color=None text=LLMs evolving from passive tools to acti
+    para1 run0: size=19.0pt bold=None color=None text=Autonomous task orchestration
+    para2 run0: size=19.0pt bold=None color=None text=Need for memory, reasoning, planning
+    para3 run0: size=inhpt bold=None color=None text=
+
+=== SLIDE 4 | layout: "TITLE_AND_BODY" ===
+  ph=0 name="Google Shape;107;p4" l=0.0 t=0.4589 w=9.3182 h=0.6647
+    text: AI Agents vs Agentic AI
+    para0 run0: size=35.0pt bold=True color=None text=AI Agents vs Agentic AI
+  ph=1 name="Google Shape;108;p4" l=0.3409 t=1.345 w=9.3182 h=3.6516
+    text: An AI Agent is an individual intelligent system that:
+ Perceives ? Decides ? Act
+    para0 run0: size=14.0pt bold=None color=None text=An 
+    para1 run0: size=14.0pt bold=True color=None text= Perceives ? Decides ? Acts
+    para2 run0: size=14.0pt bold=None color=None text=It usually works 
+    para3 run0: size=inhpt bold=None color=None text=
+
+=== SLIDE 5 | layout: "TITLE_AND_BODY" ===
+  ph=0 name="Google Shape;113;p5" l=0.0 t=0.4378 w=9.3182 h=0.6647
+    text: Evolution of Agentic AI
+    para0 run0: size=35.0pt bold=True color=None text=Evolution of Agentic AI
+  ph=None name="Google Shape;114;p5" l=0.4749 t=1.444 w=8.8438 h=2.8264
+  ph=1 name="Google Shape;115;p5" l=0.3409 t=1.345 w=9.3182 h=3.6516
+    para0 run0: size=inhpt bold=None color=None text=
+
+=== SLIDE 6 | layout: "TITLE_AND_BODY" ===
+  ph=0 name="Google Shape;120;p6" l=0.0 t=0.4694 w=9.3182 h=0.6647
+    text: Reference Platform Architecture
+    para0 run0: size=35.0pt bold=True color=None text=Reference Platform Architecture
+  ph=1 name="Google Shape;121;p6" l=0.1601 t=1.3661 w=9.0144 h=3.6516
+    text: 
+Planner: Decomposes goals into actions or chains-of-thought. Can be rule-based 
+    para0 run0: size=inhpt bold=None color=None text=
+    para1 run0: size=18.0pt bold=True color=None text=Planner: 
+    para2 run0: size=18.0pt bold=True color=None text=Memory: 
+    para3 run0: size=18.0pt bold=True color=None text=Execution/Tools: 
+
+=== SLIDE 7 | layout: "SECTION_TITLE_AND_DESCRIPTION" ===
+  ph=None name="Google Shape;126;p7" l=4.9981 t=1.3631 w=5.0039 h=3.1174
+  ph=0 name="Google Shape;127;p7" l=0.0 t=0.0 w=4.4239 h=1.711
+    text: The Agent-Tool Ecosystem
+    para0 run0: size=35.0pt bold=True color=None text=The Agent-Tool Ecosystem
+  ph=2 name="Google Shape;128;p7" l=5.0 t=1.3104 w=5.0039 h=3.2234
+    para0 run0: size=inhpt bold=None color=None text=
+  ph=1 name="Google Shape;129;p7" l=0.2904 t=1.8476 w=4.4239 h=3.2654
+    text: Orchestrating Intelligence and Action
+The platform serves as the central "nervou
+    para0 run0: size=15.0pt bold=None color=None text=Orchestrating Intelligence and Action
+    para1 run0: size=15.0pt bold=None color=None text=The platform serves as the central "nerv
+    para2 run0: size=15.0pt bold=None color=None text=Agents: The decision-makers that plan an
+    para3 run0: size=15.0pt bold=None color=None text=Tools: The external capabilities (APIs, 
+
+=== SLIDE 8 | layout: "SECTION_TITLE_AND_DESCRIPTION" ===
+  ph=0 name="Google Shape;134;p8" l=0.0 t=0.2739 w=4.4239 h=1.711
+    text: Agent Patterns
+    para0 run0: size=35.0pt bold=True color=None text=Agent Patterns
+  ph=2 name="Google Shape;135;p8" l=5.4019 t=0.792 w=4.1962 h=4.041
+    para0 run0: size=inhpt bold=None color=None text=
+  ph=1 name="Google Shape;136;p8" l=0.0 t=1.3841 w=5.0105 h=4.041
+    text: Concurrent Pattern: Multiple agents work on the same input in parallel.
+Group-ch
+    para0 run0: size=16.0pt bold=True color=None text=Concurrent Pattern:
+    para1 run0: size=16.0pt bold=True color=None text=Group-chat Pattern:
+    para2 run0: size=16.0pt bold=True color=None text=Handoff Pattern:
+    para3 run0: size=16.0pt bold=True color=None text=Magentic Pattern:
+  ph=None name="Google Shape;137;p8" l=5.0105 t=1.5279 w=4.9895 h=3.4657
+
+=== SLIDE 9 | layout: "SECTION_TITLE_AND_DESCRIPTION" ===
+  ph=0 name="Google Shape;142;p9" l=0.0 t=0.0 w=4.4239 h=1.711
+    text: Agent patterns contd., 
+    para0 run0: size=35.0pt bold=True color=None text=Agent patterns contd., 
+  ph=2 name="Google Shape;143;p9" l=5.0 t=1.2311 w=5.0 h=3.602
+    para0 run0: size=inhpt bold=None color=None text=
+  ph=1 name="Google Shape;144;p9" l=0.0 t=1.5316 w=5.0 h=4.041
+    text: ReAct (Reason + Act): Combines reasoning (thoughts) with specific actions to sol
+    para0 run0: size=11.8pt bold=True color=None text=ReAct (Reason + Act): 
+    para1 run0: size=11.8pt bold=True color=None text=Planner?Executor:
+    para2 run0: size=11.8pt bold=True color=None text=Reflex Agents:
+    para3 run0: size=11.8pt bold=True color=None text=Hierarchical Agents: 
+  ph=None name="Google Shape;145;p9" l=5.0 t=1.3631 w=5.0 h=3.602
+
+=== SLIDE 10 | layout: "SECTION_TITLE_AND_DESCRIPTION" ===
+  ph=0 name="Google Shape;150;p10" l=0.0 t=0.0 w=4.4239 h=1.711
+    text: Agent Design
+    para0 run0: size=35.0pt bold=True color=None text=Agent Design
+  ph=2 name="Google Shape;151;p10" l=5.4019 t=0.792 w=4.1962 h=4.041
+    text: 
+
+    para0 run0: size=inhpt bold=None color=None text=
+    para1 run0: size=inhpt bold=None color=None text=
+  ph=None name="Google Shape;152;p10" l=5.0 t=1.3363 w=5.0 h=3.4967
+  ph=1 name="Google Shape;153;p10" l=0.0 t=1.0154 w=5.0 h=4.6096
+    text: 1. The Sensory Layer: Perception
+The agent begins by receiving user input, envir
+    para0 run0: size=11.0pt bold=True color=None text=1. The Sensory Layer: Perception
+    para1 run0: size=11.0pt bold=None color=None text=The agent begins by receiving user input
+    para2 run0: size=11.0pt bold=True color=None text=2. The Cognitive Core: Reasoning & Plann
+    para3 run0: size=11.0pt bold=None color=None text=The brain of the agent analyzes all gath
+
+=== SLIDE 11 | layout: "TITLE" ===
+  ph=0 name="Google Shape;158;p11" l=0.0 t=0.4035 w=8.9918 h=0.9173
+    text: Conclusion
+    para0 run0: size=35.0pt bold=True color=None text=Conclusion
+  ph=1 name="Google Shape;159;p11" l=0.7173 t=1.5632 w=8.2746 h=2.7703
+    text: Evolution: Agentic AI is about building ecosystems, not just individual tools.
+S
+    para0 run0: size=16.0pt bold=None color=None text=Evolution: Agentic AI is about building 
+    para1 run0: size=16.0pt bold=None color=None text=Systems Thinking: Success requires a bal
+    para2 run0: size=16.0pt bold=None color=None text=Patterns Matter: Choosing the right inte
+    para3 run0: size=16.0pt bold=None color=None text=Foundations Set: You now have the archit

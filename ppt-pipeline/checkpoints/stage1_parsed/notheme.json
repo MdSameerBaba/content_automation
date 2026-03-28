@@ -1,0 +1,60 @@
+{
+  "filename": "notheme",
+  "page_count": 9,
+  "slides": [
+    {
+      "slide_num": 1,
+      "title": "Agenda",
+      "raw_text": "Agenda\nIntroduction\nAgent Architectures\nPlatform Reference Architecture\nTools & Frameworks\nWorking Examples\nCommunication Protocols (MCP, A2A, ACP)\nBest Practices",
+      "word_count": 19
+    },
+    {
+      "slide_num": 2,
+      "title": "Why Agentic AI?",
+      "raw_text": "Why Agentic AI?\nLLMs evolving from passive tools to active agents\n●\nAutonomous task orchestration\n●\nNeed for memory, reasoning, planning\n●",
+      "word_count": 22
+    },
+    {
+      "slide_num": 3,
+      "title": "AI Agents vs Agentic AI",
+      "raw_text": "AI Agents vs Agentic AI\nAn AI Agent is an individual intelligent system that:\n● Perceives → Decides → Acts to achieve a goal.\n● It usually works alone and focuses on completing specific tasks.\nAgentic AI is a system-level paradigm where:\n● Multiple intelligent agents collaborate, plan, learn, and self-improve to achieve complex goals.\n● It is about building ecosystems of agents, not just one.",
+      "word_count": 66
+    },
+    {
+      "slide_num": 4,
+      "title": "Evolution of Agentic AI",
+      "raw_text": "Evolution of Agentic AI",
+      "word_count": 4
+    },
+    {
+      "slide_num": 5,
+      "title": "Reference Platform Architecture",
+      "raw_text": "Reference Platform Architecture\n○ Planner: Decomposes goals into actions or chains-of-thought. Can be\nrule-based or LLM-based (chain-of-thought prompts). Guides overall strategy\n○ Memory: Often split into working memory (short-term conversation context)\nand persistent memory (long-term vector store)\n○ Execution/Tools: Agents execute plans by calling external tools/APIs (e.g.,\nsearch, databases, web APIs)\n○ Observability: Integrate logging, tracing, and metrics (e.g. via OpenTelemetry)\nto track agent decisions and performance\n○ Environment: The “perception” layer – how agents receive input (user\nrequests, sensor data, events) and output results (UI, API responses).",
+      "word_count": 88
+    },
+    {
+      "slide_num": 6,
+      "title": "",
+      "raw_text": "",
+      "word_count": 0
+    },
+    {
+      "slide_num": 7,
+      "title": "Agent Patterns",
+      "raw_text": "Agent Patterns\n● Concurrent Pattern: Multiple agents work on the same input in parallel.\n● Group-chat Pattern: Agents and optional humans interact via chat interface.\n● Handoff Pattern: Agents dynamically pass the control\n● Magentic Pattern: A central manager selects which special agent to invoke\nnext\n● Collector Pattern",
+      "word_count": 49
+    },
+    {
+      "slide_num": 8,
+      "title": "Agent patterns contd.,",
+      "raw_text": "Agent patterns contd.,\nPlanner–Executor: Planner creates a plan and executor performs\n1\nsteps. A type of Hand-off pattern.\nReflex Agents: Respond to stimuli, they dont have memory. Used in\nchatbots, simple automation.\nHierarchical Agents: High-level agent delegates tasks. This is also a\ntype of magentic pattern.\nAutonomous Loop Agents:They have Continuous sense–think–act\ncycle",
+      "word_count": 53
+    },
+    {
+      "slide_num": 9,
+      "title": "Agent Patterns",
+      "raw_text": "Agent Patterns",
+      "word_count": 2
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+flask
+python-pptx
+python-dotenv
+pdfplumber
+openai
+moviepy
+Pillow
+pdf2image
+kokoro
+imageio-ffmpeg
+numpy
+soundfile
+gtts

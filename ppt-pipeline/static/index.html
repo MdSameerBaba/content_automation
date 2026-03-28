@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPT Content Automation Pipeline</title>
+  <meta name="description" content="Automated PowerPoint pipeline: PDF to themed PPTX and MP4 video with AI narration.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: #0f1225;
+      color: #e2e8f0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 270px;
+      min-width: 270px;
+      background: linear-gradient(180deg, #1a1f3a 0%, #14182e 100%);
+      padding: 36px 24px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(57,73,171,0.2);
+    }
+
+    .sidebar-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #7986cb;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-sub {
+      font-size: 0.72rem;
+      color: #4a5568;
+      margin-bottom: 36px;
+    }
+
+    .stages-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #4a5568;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .stage-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 4px;
+      position: relative;
+    }
+
+    .stage-item:hover:not(.disabled) {
+      background: rgba(57,73,171,0.15);
+      transform: translateX(2px);
+    }
+
+    .stage-item.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .stage-item.running {
+      background: rgba(57,73,171,0.12);
+    }
+
+    .stage-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #2d3748;
+      background: #2d3748;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .stage-dot.pending  { background: #2d3748; border-color: #4a5568; }
+    .stage-dot.complete { background: #3949AB; border-color: #3949AB; }
+    .stage-dot.running  { background: transparent; border-color: #7986cb; animation: spin-border 1s linear infinite; }
+    .stage-dot.error    { background: #c53030; border-color: #c53030; }
+
+    .stage-dot.complete::after {
+      content: '✓';
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .stage-dot.error::after {
+      content: '✕';
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    @keyframes spin-border {
+      0%   { box-shadow: 2px 0 0 0 #7986cb; }
+      25%  { box-shadow: 0 2px 0 0 #7986cb; }
+      50%  { box-shadow: -2px 0 0 0 #7986cb; }
+      75%  { box-shadow: 0 -2px 0 0 #7986cb; }
+      100% { box-shadow: 2px 0 0 0 #7986cb; }
+    }
+
+    .stage-name {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #cbd5e0;
+    }
+
+    .stage-badge {
+      margin-left: auto;
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(57,73,171,0.25);
+      color: #7986cb;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stage-connector {
+      width: 2px;
+      height: 14px;
+      background: rgba(57,73,171,0.2);
+      margin-left: 20px;
+    }
+
+    /* ── Main content ── */
+    .main {
+      flex: 1;
+      padding: 48px 56px;
+      overflow-y: auto;
+    }
+
+    .main-header {
+      margin-bottom: 40px;
+    }
+
+    .main-header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .main-header p {
+      font-size: 0.9rem;
+      color: #718096;
+      max-width: 560px;
+    }
+
+    /* ── Upload zone ── */
+    .upload-zone {
+      border: 2px dashed rgba(57,73,171,0.5);
+      border-radius: 16px;
+      background: rgba(57,73,171,0.05);
+      color: #7986cb;
+      padding: 56px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      margin-bottom: 36px;
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: #3949AB;
+      background: rgba(57,73,171,0.1);
+      transform: translateY(-1px);
+    }
+
+    .upload-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .upload-zone h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #a0aec0;
+      margin-bottom: 6px;
+    }
+
+    .upload-zone p {
+      font-size: 0.82rem;
+      color: #4a5568;
+    }
+
+    #fileInput { display: none; }
+
+    /* ── Status bar ── */
+    #statusBar {
+      display: none;
+      background: rgba(57,73,171,0.1);
+      border: 1px solid rgba(57,73,171,0.2);
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 28px;
+      font-size: 0.85rem;
+      color: #a0aec0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #statusBar .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3949AB;
+      flex-shrink: 0;
+    }
+
+    /* ── Slide table ── */
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #4a5568;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+
+    .slide-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(26,31,58,0.6);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(57,73,171,0.15);
+    }
+
+    .slide-table th {
+      padding: 12px 16px;
+      background: rgba(57,73,171,0.15);
+      color: #7986cb;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .slide-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(57,73,171,0.08);
+      font-size: 0.85rem;
+      color: #cbd5e0;
+    }
+
+    .slide-table tr:last-child td { border-bottom: none; }
+    .slide-table tr:hover td { background: rgba(57,73,171,0.06); }
+
+    .slide-num-badge {
+      display: inline-block;
+      background: rgba(57,73,171,0.2);
+      color: #7986cb;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* ── Error box ── */
+    .error-box {
+      background: rgba(197,48,48,0.1);
+      border: 1px solid rgba(197,48,48,0.3);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: #fc8181;
+      font-size: 0.83rem;
+      margin-top: 16px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: none;
+    }
+
+    /* ── Voice selector ── */
+    .voice-selector {
+      background: rgba(57,73,171,0.1);
+      border: 1px solid rgba(57,73,171,0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .voice-selector h3 {
+      font-size: 1rem;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+    .voice-desc {
+      font-size: 0.8rem;
+      color: #a0aec0;
+      margin-bottom: 16px;
+    }
+    .voice-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .voice-item {
+      background: rgba(30,41,81,0.6);
+      border: 2px solid rgba(57,73,171,0.3);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .voice-item:hover {
+      border-color: rgba(57,73,171,0.6);
+    }
+    .voice-item.selected {
+      border-color: #4caf50;
+      background: rgba(76,175,80,0.1);
+    }
+    .voice-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+    .voice-gender {
+      font-size: 0.75rem;
+      color: #a0aec0;
+    }
+    .voice-preview-btn {
+      margin-top: 8px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      background: rgba(57,73,171,0.3);
+      border: none;
+      border-radius: 4px;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+    .voice-preview-btn:hover {
+      background: rgba(57,73,171,0.5);
+    }
+    .voice-preview-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .voice-selected {
+      font-size: 0.85rem;
+      color: #a0aec0;
+      margin-bottom: 12px;
+    }
+    .voice-selected span {
+      color: #4caf50;
+      font-weight: 600;
+    }
+
+    /* ── Result panel ── */
+    .result-panel {
+      background: rgba(57,73,171,0.06);
+      border: 1px solid rgba(57,73,171,0.15);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 24px;
+    }
+
+    .result-panel h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #7986cb;
+      margin-bottom: 12px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #a0aec0;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-val { color: #e2e8f0; font-weight: 500; }
+
+    /* ── Loading overlay ── */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,18,37,0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      display: none;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(57,73,171,0.3);
+      border-top-color: #3949AB;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      color: #a0aec0;
+      font-size: 0.9rem;
+    }
+    /* ── Review Gate ── */
+    .review-gate {
+      background: linear-gradient(135deg, rgba(57,73,171,0.1), rgba(121,134,203,0.04));
+      border: 1px solid rgba(57,73,171,0.3);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-top: 28px;
+      display: none;
+    }
+    .review-gate h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .review-gate .gate-desc {
+      font-size: 0.85rem;
+      color: #718096;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .gate-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+    .btn-download {
+      background: #3949AB;
+      color: #fff;
+      border: none;
+      padding: 11px 24px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-download:hover { background: #5c6bc0; transform: translateY(-1px); }
+    .btn-skip {
+      background: transparent;
+      color: #718096;
+      border: 1px solid rgba(57,73,171,0.3);
+      padding: 11px 24px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-skip:hover { color: #a0aec0; border-color: rgba(57,73,171,0.5); }
+    .gate-divider { height: 1px; background: rgba(57,73,171,0.15); margin: 20px 0; }
+    .step-pill {
+      background: rgba(57,73,171,0.2);
+      color: #7986cb;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .upload-revised-zone {
+      border: 2px dashed rgba(57,73,171,0.4);
+      border-radius: 12px;
+      padding: 22px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(57,73,171,0.04);
+    }
+    .upload-revised-zone:hover { border-color: #3949AB; background: rgba(57,73,171,0.09); }
+    .upload-revised-zone p { font-size: 0.85rem; color: #718096; margin-bottom: 6px; }
+    .upload-revised-zone .upload-hint { font-size: 0.73rem; color: #4a5568; }
+    .revised-status {
+      background: rgba(67,160,71,0.1);
+      border: 1px solid rgba(67,160,71,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #68d391;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Running stage...</div>
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">⚡ PPT Pipeline</div>
+  <div class="sidebar-sub">PDF → PPTX → MP4 · AI powered</div>
+
+  <div class="stages-label">Pipeline Stages</div>
+
+  <div class="stage-item disabled" id="stage-parse" title="Runs automatically on PDF upload">
+    <div class="stage-dot pending" id="dot-parse"></div>
+    <span class="stage-name">1 · Parse</span>
+    <span class="stage-badge">auto</span>
+  </div>
+  <div class="stage-connector"></div>
+
+  <div class="stage-item disabled" id="stage-structure" onclick="runStage('structure')" title="Group slides into sections with AI">
+    <div class="stage-dot pending" id="dot-structure"></div>
+    <span class="stage-name">2 · Structure</span>
+  </div>
+  <div class="stage-connector"></div>
+
+  <div class="stage-item disabled" id="stage-content" onclick="runStage('content')" title="AI fills gaps + writes speaker notes">
+    <div class="stage-dot pending" id="dot-content"></div>
+    <span class="stage-name">3 · Content</span>
+  </div>
+  <div class="stage-connector"></div>
+
+  <div class="stage-item disabled" id="stage-build" onclick="runStage('build')" title="Build themed PPTX from template">
+    <div class="stage-dot pending" id="dot-pptx"></div>
+    <span class="stage-name">4 · Build PPTX</span>
+  </div>
+  <div class="stage-connector"></div>
+
+  <div class="stage-item disabled" id="stage-images" onclick="runStage('images')" title="Export slides as PNG images">
+    <div class="stage-dot pending" id="dot-images"></div>
+    <span class="stage-name">5 · Images</span>
+  </div>
+  <div class="stage-connector"></div>
+
+  <div class="stage-item disabled" id="stage-audio" onclick="runStage('audio')" title="Generate voiceover + SRT subtitles">
+    <div class="stage-dot pending" id="dot-audio"></div>
+    <span class="stage-name">6 · Audio</span>
+  </div>
+  <div class="stage-connector"></div>
+
+  <div class="stage-item disabled" id="stage-video" onclick="runStage('video')" title="Assemble final MP4 video">
+    <div class="stage-dot pending" id="dot-video"></div>
+    <span class="stage-name">7 · Video</span>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="main-header">
+    <h1>Content Automation Pipeline</h1>
+    <p>Upload a PDF export of your Google Slides deck, then run each stage in order to generate a themed PPTX and MP4 video.</p>
+  </div>
+
+  <div class="upload-zone" id="uploadZone">
+    <span class="upload-icon">📄</span>
+    <h2>Drop your PDF here</h2>
+    <p>or click to browse &middot; PDF files only</p>
+    <input type="file" id="fileInput" accept="application/pdf">
+  </div>
+
+  <div id="statusBar" style="display:none;">
+    <div class="status-dot"></div>
+    <span id="statusText">Ready</span>
+  </div>
+
+  <div id="errorBox" class="error-box"></div>
+
+  <!-- Voice Selection -->
+  <div id="voiceSelector" class="voice-selector" style="display:none;">
+    <h3>🎤 Select Voice</h3>
+    <p class="voice-desc">Preview and choose your preferred voice for narration</p>
+    <div id="voiceList" class="voice-list"></div>
+    <div class="voice-selected" id="voiceSelected">
+      Selected: <span id="selectedVoiceName">Heart (Female)</span>
+    </div>
+    <button class="btn-primary" onclick="confirmVoice()">Confirm & Generate Audio</button>
+  </div>
+
+  <div id="slideTableContainer"></div>
+  <div id="resultPanel"></div>
+
+  <!-- Human Review Gate: shown after Stage 4 completes -->
+  <div class="review-gate" id="reviewGate">
+    <h3>&#x1F50D; Human Review Gate &nbsp;<span class="step-pill">Stage 4 → 5</span></h3>
+    <p class="gate-desc">
+      The AI has built your PPTX with speaker notes (= narration script). Download it, review and
+      edit slides &amp; notes in PowerPoint, then upload the revised version before running Stage 5.
+      <br><strong style="color:#a0aec0">Tip:</strong> The <em>Speaker Notes</em> pane controls exactly what the narrator says in the video.
+    </p>
+    <div class="gate-actions">
+      <button class="btn-download" id="btnDownloadPptx" onclick="downloadPptx()">&#x2B07; Download PPTX</button>
+      <button class="btn-skip" onclick="skipReview()">Skip review → use AI version</button>
+    </div>
+    <div class="gate-divider"></div>
+    <p style="margin-bottom:12px;font-size:0.82rem;color:#a0aec0;">Upload your revised PPTX when ready (optional):</p>
+    <div class="upload-revised-zone" id="uploadRevisedZone"
+         onclick="document.getElementById('revisedFileInput').click()"
+         ondragover="event.preventDefault();this.style.borderColor='#3949AB'"
+         ondragleave="this.style.borderColor=''"
+         ondrop="event.preventDefault();this.style.borderColor='';uploadRevised(event.dataTransfer.files[0])">
+      <p>&#x1F4C2; Click to browse or drag your revised PPTX here</p>
+      <div class="upload-hint">.pptx files only &middot; Speaker Notes = narration script</div>
+      <input type="file" id="revisedFileInput" accept=".pptx" style="display:none"
+             onchange="uploadRevised(this.files[0])">
+    </div>
+    <div class="revised-status" id="revisedStatus"></div>
+  </div>
+
+
+<script>
+  /* ── State ── */
+  let currentFilename = null;
+  let activeStage = null;
+
+  const STAGE_MAP = {
+    structure: { prev: 'stage1_parsed',    endpoint: '/pipeline/structure', dotId: 'dot-structure', itemId: 'stage-structure' },
+    content:   { prev: 'stage2_structured', endpoint: '/pipeline/content',   dotId: 'dot-content',   itemId: 'stage-content'   },
+    build:     { prev: 'stage3_content',    endpoint: '/pipeline/build',      dotId: 'dot-pptx',      itemId: 'stage-build'     },
+    images:    { prev: 'stage4_pptx',       endpoint: '/pipeline/images',     dotId: 'dot-images',    itemId: 'stage-images'    },
+    audio:     { prev: 'stage5_images',     endpoint: '/pipeline/audio',      dotId: 'dot-audio',     itemId: 'stage-audio'     },
+    video:     { prev: 'stage6_audio',      endpoint: '/pipeline/video',      dotId: 'dot-video',     itemId: 'stage-video'     },
+  };
+
+  /* ── Upload zone ── */
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput  = document.getElementById('fileInput');
+
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; handleUpload(); }
+  });
+  fileInput.addEventListener('change', handleUpload);
+
+  function handleUpload() {
+    const file = fileInput.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.pdf')) { showError('Please upload a PDF file.'); return; }
+
+    clearError();
+    resetProgress();
+    showStatus('Uploading and parsing PDF…');
+    setDot('dot-parse', 'running');
+    showLoading('Parsing PDF slides…');
+
+    const form = new FormData();
+    form.append('file', file);
+
+    fetch('/upload', { method: 'POST', body: form })
+      .then(r => r.json())
+      .then(data => {
+        hideLoading();
+        if (data.error) { setDot('dot-parse', 'error'); showError(data.error); return; }
+        currentFilename = data.filename;
+        setDot('dot-parse', 'complete');
+        showStatus(`✓ Parsed "${data.filename}" — ${data.page_count} slide(s) found`);
+        renderSlideTable(data.slides);
+        fetchStatus();
+      })
+      .catch(() => { hideLoading(); setDot('dot-parse', 'error'); showError('Upload failed. Is the server running?'); });
+  }
+
+  /* ── Voice Selection ── */
+  let selectedVoice = 'af_heart';
+  let voices = {};
+
+  async function showVoiceSelector() {
+    try {
+      const res = await fetch('/voices');
+      const data = await res.json();
+      voices = data.voices;
+      
+      const container = document.getElementById('voiceList');
+      container.innerHTML = '';
+      
+      for (const [vid, vinfo] of Object.entries(voices)) {
+        const div = document.createElement('div');
+        div.className = 'voice-item' + (vid === selectedVoice ? ' selected' : '');
+        div.id = 'voice-' + vid;
+        div.onclick = () => selectVoice(vid);
+        div.innerHTML = `
+          <div class="voice-name">${vinfo.name}</div>
+          <div class="voice-gender">${vinfo.gender}</div>
+          <button class="voice-preview-btn" id="preview-${vid}" onclick="event.stopPropagation(); playPreview('${vid}')">▶ Preview</button>
+        `;
+        container.appendChild(div);
+      }
+      
+      document.getElementById('voiceSelector').style.display = 'block';
+    } catch (e) {
+      console.error('Failed to load voices:', e);
+    }
+  }
+
+  function selectVoice(vid) {
+    selectedVoice = vid;
+    document.querySelectorAll('.voice-item').forEach(el => el.classList.remove('selected'));
+    document.getElementById('voice-' + vid).classList.add('selected');
+    document.getElementById('selectedVoiceName').textContent = voices[vid].name;
+  }
+
+  async function playPreview(vid) {
+    const btn = document.getElementById('preview-' + vid);
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    
+    try {
+      const res = await fetch('/voices/preview', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({voice_id: vid})
+      });
+      const data = await res.json();
+      
+      if (data.success && data.result.preview_url) {
+        const audio = new Audio(data.result.preview_url);
+        audio.onended = () => {
+          btn.disabled = false;
+          btn.textContent = '▶ Preview';
+        };
+        audio.play();
+      } else {
+        btn.disabled = false;
+        btn.textContent = '❌ Failed';
+        setTimeout(() => btn.textContent = '▶ Preview', 2000);
+      }
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = '❌ Error';
+      setTimeout(() => btn.textContent = '▶ Preview', 2000);
+    }
+  }
+
+  function confirmVoice() {
+    document.getElementById('voiceSelector').style.display = 'none';
+    runStageWithVoice('audio', selectedVoice);
+  }
+
+  /* ── Run a pipeline stage ── */
+  function runStage(stage) {
+    if (stage === 'audio') {
+      showVoiceSelector();
+      return;
+    }
+    runStageWithVoice(stage, null);
+  }
+
+  function runStageWithVoice(stage, voice) {
+    if (!currentFilename || activeStage) return;
+
+    const cfg = STAGE_MAP[stage];
+    if (!cfg) return;
+
+    const item = document.getElementById(cfg.itemId);
+    if (item.classList.contains('disabled')) return;
+
+    activeStage = stage;
+    clearError();
+    document.getElementById('resultPanel').innerHTML = '';
+    setDot(cfg.dotId, 'running');
+    item.classList.add('running');
+
+    const labels = {
+      structure: 'Running AI slide grouping…',
+      content:   'Running AI content fill + speaker notes (this takes ~30s)…',
+      build:     'Building themed PPTX…',
+      images:    'Exporting slides to PNG…',
+      audio:     'Generating voiceover + SRT…',
+      video:     'Assembling MP4 video…',
+    };
+    showLoading(labels[stage] || 'Running…');
+    showStatus(labels[stage] || 'Running…');
+
+    const fetchOptions = { method: 'POST' };
+    if (voice) {
+      fetchOptions.headers = {'Content-Type': 'application/json'};
+      fetchOptions.body = JSON.stringify({voice: voice});
+    }
+    
+    fetch(`${cfg.endpoint}/${currentFilename}`, fetchOptions)
+      .then(r => r.json())
+      .then(data => {
+        hideLoading();
+        activeStage = null;
+        item.classList.remove('running');
+
+        if (data.success === false || data.error) {
+          setDot(cfg.dotId, 'error');
+          showError((data.error || 'Unknown error') + (data.traceback ? '\n\n' + data.traceback : ''));
+          showStatus('Stage failed — see error below');
+          fetchStatus();
+          return;
+        }
+
+        setDot(cfg.dotId, 'complete');
+        showStatus(`✓ Stage "${stage}" complete!`);
+        renderResult(stage, data);
+        fetchStatus();
+      })
+      .catch(err => {
+        hideLoading();
+        activeStage = null;
+        item.classList.remove('running');
+        setDot(cfg.dotId, 'error');
+        showError('Network error: ' + err.message);
+        fetchStatus();
+      });
+  }
+
+  /* ── Fetch pipeline status + update sidebar ── */
+  function fetchStatus() {
+    if (!currentFilename) return;
+    fetch(`/pipeline/status/${currentFilename}`)
+      .then(r => r.json())
+      .then(status => {
+        setDot('dot-parse',     status.stage1_parsed     ? 'complete' : 'pending');
+        setDot('dot-structure', status.stage2_structured ? 'complete' : 'pending');
+        setDot('dot-content',   status.stage3_content    ? 'complete' : 'pending');
+        setDot('dot-pptx',      status.stage4_pptx       ? 'complete' : 'pending');
+        setDot('dot-images',    status.stage5_images      ? 'complete' : 'pending');
+        setDot('dot-audio',     status.stage6_audio       ? 'complete' : 'pending');
+        setDot('dot-video',     status.stage7_video       ? 'complete' : 'pending');
+
+        // Unlock stages based on prerequisites
+        setEnabled('stage-structure', status.stage1_parsed);
+        setEnabled('stage-content',   status.stage2_structured);
+        setEnabled('stage-build',     status.stage3_content);
+        setEnabled('stage-images',    status.stage4_pptx);
+        setEnabled('stage-audio',     status.stage5_images);
+        setEnabled('stage-video',     status.stage6_audio);
+      });
+  }
+
+  /* ── Helpers ── */
+  function setDot(id, state) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'stage-dot ' + state;
+  }
+
+  function setEnabled(id, enabled) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (enabled) el.classList.remove('disabled');
+    else         el.classList.add('disabled');
+  }
+
+  function resetProgress() {
+    ['dot-parse','dot-structure','dot-content','dot-pptx','dot-images','dot-audio','dot-video']
+      .forEach(id => setDot(id, 'pending'));
+    ['stage-structure','stage-content','stage-build','stage-images','stage-audio','stage-video']
+      .forEach(id => setEnabled(id, false));
+  }
+
+  function showStatus(msg) {
+    const bar = document.getElementById('statusBar');
+    bar.style.display = 'flex';
+    document.getElementById('statusText').textContent = msg;
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = msg;
+    box.style.display = 'block';
+  }
+
+  function clearError() {
+    const box = document.getElementById('errorBox');
+    box.textContent = '';
+    box.style.display = 'none';
+  }
+
+  function showLoading(msg) {
+    document.getElementById('loadingText').textContent = msg || 'Running…';
+    document.getElementById('loadingOverlay').style.display = 'flex';
+  }
+
+  function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+
+  function renderSlideTable(slides) {
+    if (!slides || !slides.length) { document.getElementById('slideTableContainer').innerHTML = ''; return; }
+    let html = '<div class="section-title" style="margin-top:0">Parsed Slides</div>';
+    html += '<table class="slide-table"><thead><tr><th>#</th><th>Detected Title</th><th>Words</th></tr></thead><tbody>';
+    for (const s of slides) {
+      html += `<tr><td><span class="slide-num-badge">${s.slide_num}</span></td><td>${s.title || '<em style="color:#4a5568">—</em>'}</td><td>${s.word_count}</td></tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('slideTableContainer').innerHTML = html;
+  }
+
+  function renderResult(stage, data) {
+    const panel = document.getElementById('resultPanel');
+    let rows = [];
+
+    if (stage === 'structure') {
+      const r = data.result || {};
+      rows = [
+        ['Sections (TOC)', (r.toc || []).join(', ') || '—'],
+        ['Groups', (r.groups || []).length],
+        ['Unassigned slides', (r.unassigned_slides || []).length || 'None'],
+      ];
+    } else if (stage === 'content') {
+      rows = [
+        ['Presentation title', data.audit?.presentation_title || '—'],
+        ['Has title slide', data.audit?.has_title_slide ? '✓ Yes' : '✗ No'],
+        ['Has agenda slide', data.audit?.has_agenda_slide ? '✓ Yes' : '✗ No'],
+        ['Has conclusion', data.audit?.has_conclusion_slide ? '✓ Yes' : '✗ No'],
+        ['Generated missing slides', (data.missing_slides || []).map(s => s.slide_type).join(', ') || 'None'],
+        ['Speaker notes written', data.speaker_notes_count],
+        ['Final slide count', data.final_slides],
+      ];
+    } else if (stage === 'build') {
+      const r = data.result || {};
+      rows = [
+        ['Total slides', r.total_slides || '—'],
+        ['Narrator words', r.narrator_words || '—'],
+        ['Estimated duration', r.estimated_minutes ? r.estimated_minutes + ' min' : '—'],
+      ];
+      document.getElementById('reviewGate').style.display = 'block';
+      document.getElementById('revisedStatus').style.display = 'none';
+    } else if (stage === 'images') {
+      const r = data.result || {};
+      rows = [
+        ['Slides exported', r.slide_count || '—'],
+        ['Method', r.method || '—'],
+      ];
+    } else if (stage === 'audio') {
+      const r = data.result || {};
+      rows = [
+        ['Audio files', r.slide_count || '—'],
+        ['Total words', r.total_words || '—'],
+        ['Voice', r.voice || '—'],
+      ];
+    } else if (stage === 'video') {
+      const r = data.result || {};
+      rows = [
+        ['Total slides', r.total_slides || '—'],
+        ['Video duration', r.total_duration_seconds ? r.total_duration_seconds + 's (' + r.total_duration_minutes + ' min)' : '—'],
+        ['Resolution', r.fps ? r.fps + ' fps' : '—'],
+        ['Codec', r.codec || '—'],
+      ];
+      // Add download button for video
+      rows.push(['Download', `<button class="btn-download" onclick="downloadVideo()">&#x2B07; Download MP4</button>`]);
+    } else {
+      rows = [['Status', 'Complete ✓']];
+    }
+
+    let html = `<div class="result-panel"><h3>Stage "${stage}" Result</h3>`;
+    for (const [k, v] of rows) {
+      html += `<div class="result-row"><span>${k}</span><span class="result-val">${v}</span></div>`;
+    }
+    html += '</div>';
+    panel.innerHTML = html;
+  }
+  function downloadPptx() {
+    if (!currentFilename) return;
+    window.location.href = `/download-pptx/${currentFilename}`;
+  }
+
+  function downloadVideo() {
+    if (!currentFilename) return;
+    window.location.href = `/download-video/${currentFilename}`;
+  }
+
+  function skipReview() {
+    // No upload needed — stages 5-7 will use the AI-generated PPTX
+    document.getElementById('reviewGate').style.display = 'none';
+    showStatus('Skipped review — AI-generated PPTX will be used for stages 5–7.');
+    setEnabled('stage-images', true);
+  }
+
+  async function uploadRevised(file) {
+    if (!file || !file.name.toLowerCase().endsWith('.pptx')) {
+      showError('Please upload a .pptx file.'); return;
+    }
+    if (!currentFilename) { showError('No active project.'); return; }
+
+    showLoading('Uploading revised PPTX…');
+    const form = new FormData();
+    form.append('file', file);
+    form.append('filename', currentFilename);
+
+    try {
+      const res  = await fetch('/upload-revised-pptx', { method: 'POST', body: form });
+      const data = await res.json();
+      hideLoading();
+
+      if (data.success) {
+        const status = document.getElementById('revisedStatus');
+        status.style.display = 'block';
+        status.textContent = `✓ ${data.message}`;
+        showStatus('✓ Revised PPTX uploaded — ready for Stage 5.');
+        setEnabled('stage-images', true);
+      } else {
+        showError(data.error || 'Upload failed.');
+      }
+    } catch(e) {
+      hideLoading();
+      showError('Upload failed: ' + e.message);
+    }
+  }
+
+</script>
+</body>
+</html>

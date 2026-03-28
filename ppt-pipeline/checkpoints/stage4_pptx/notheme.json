@@ -1,0 +1,136 @@
+{
+  "filename": "notheme",
+  "output_path": "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage4_pptx\\notheme.pptx",
+  "total_slides": 11,
+  "narrator_words": 891,
+  "estimated_minutes": 6.85,
+  "slide_manifest": [
+    {
+      "slide_num": 1,
+      "type": "title",
+      "title": "Introduction to Agentic AI",
+      "bullets": [],
+      "notes": "Welcome to the introduction to Agentic AI, a presentation that will explore the concepts and applications of Agentic AI, and its potential to revolutionize the way we interact with artificial intelligence. In this presentation, we will delve into the fundamentals of Agentic AI and its evolution. Let's begin our journey to understand the power of Agentic AI."
+    },
+    {
+      "slide_num": 2,
+      "type": "content",
+      "title": "Agenda",
+      "bullets": [
+        "Why Agentic AI?",
+        "AI Agents vs Agentic AI",
+        "Evolution of Agentic AI",
+        "Reference Platform Architecture",
+        "Agent Patterns",
+        "Agent patterns contd.,"
+      ],
+      "notes": "Welcome to our presentation, where we'll be covering a comprehensive overview of the key aspects of our system, starting with an introduction to the fundamental concepts. As we walk through this agenda, you'll notice that we've structured our discussion around several core topics, including agent architectures and platform reference architecture, which will provide a solid foundation for the rest of our conversation. Throughout the next few slides, we'll delve into the specifics of tools and frameworks, working examples, and communication protocols, ultimately culminating in a discussion of best practices that you can apply in your own work."
+    },
+    {
+      "slide_num": 3,
+      "type": "content",
+      "title": "Why Agentic AI?",
+      "bullets": [
+        "LLMs evolving from passive tools to active agents Autonomous task orchestration",
+        "Need for memory, reasoning, planning"
+      ],
+      "notes": "As we explore the concept of Agentic AI, it's essential to understand the evolution of Large Language Models from mere passive tools to active agents that can autonomously handle complex tasks. This shift necessitates the development of advanced capabilities, including memory, reasoning, and planning, which enable these agents to make informed decisions and take actions independently. By examining the need for these capabilities, we can better understand why Agentic AI is becoming increasingly important. This transition is crucial for AI systems to move beyond simple automation and become more effective partners in various applications."
+    },
+    {
+      "slide_num": 4,
+      "type": "content",
+      "title": "AI Agents vs Agentic AI",
+      "bullets": [
+        "An AI Agent is an individual intelligent system that:",
+        "Perceives → Decides → Acts to achieve a goal.",
+        "It usually works alone and focuses on completing specific tasks.",
+        "Agentic AI is a system-level paradigm where:",
+        "Multiple intelligent agents collaborate, plan, learn, and self-improve to achieve complex goals.",
+        "It is about building ecosystems of agents, not just one."
+      ],
+      "notes": "As we move forward, let's distinguish between two key concepts: AI Agents and Agentic AI. An AI Agent is essentially a single entity that perceives its environment, decides on a course of action, and acts to achieve a specific goal, often working independently. In contrast, Agentic AI represents a more collaborative approach, where multiple intelligent agents work together to learn, plan, and improve, ultimately forming complex ecosystems. This shift from individual agents to a collective, self-improving system is crucial for tackling more sophisticated challenges."
+    },
+    {
+      "slide_num": 5,
+      "type": "content",
+      "title": "Evolution of Agentic AI",
+      "bullets": [],
+      "notes": "As we move forward in our discussion, let's take a closer look at the evolution of Agentic AI, which has undergone significant transformations over the years. We've seen a shift from basic autonomous systems to more complex and sophisticated agents that can interact with their environment in a more human-like way. This evolution has been driven by advances in machine learning, natural language processing, and computer vision, enabling AI systems to perceive, reason, and act in increasingly intelligent ways. As we explore this evolution, we'll examine the key milestones and breakthroughs that have brought us to where we are today."
+    },
+    {
+      "slide_num": 6,
+      "type": "content",
+      "title": "Reference Platform Architecture",
+      "bullets": [
+        "Planner: Decomposes goals into actions or chains-of-thought. Can be rule-based or LLM-based (chain-of-thought prompts). Guides overall strategy",
+        "Memory: Often split into working memory (short-term conversation context) and persistent memory (long-term vector store)",
+        "Execution/Tools: Agents execute plans by calling external tools/APIs (e.g., search, databases, web APIs)",
+        "Observability: Integrate logging, tracing, and metrics (e.g. via OpenTelemetry) to track agent decisions and performance",
+        "Environment: The “perception” layer – how agents receive input (user requests, sensor data, events) and output results (UI, API responses)."
+      ],
+      "notes": "Now, let's take a closer look at the reference platform architecture that powers our system. At its core, this architecture is designed to guide the overall strategy, starting with a planner that decomposes goals into actionable steps. As we move through the architecture, we see how memory, execution, and observability all play critical roles in enabling our agents to make informed decisions and take effective actions. By understanding how these components work together, we can better appreciate the complexity and potential of our reference platform."
+    },
+    {
+      "slide_num": 7,
+      "type": "content",
+      "title": "The Agent-Tool Ecosystem",
+      "bullets": [
+        "As we move forward to the next stage of our discussion, let's take a",
+        "moment to reflect on the key findings that have led us to this point.",
+        "Our analysis has revealed some interesting trends and patterns that warrant further exploration.",
+        "Now, on this sixth slide, we'll delve into the implications",
+        "of these discoveries and how they might inform our decision-making process."
+      ],
+      "notes": "As we move forward to the next stage of our discussion, let's take a moment to reflect on the key findings that have led us to this point. Our analysis has revealed some interesting trends and patterns that warrant further exploration. Now, on this sixth slide, we'll delve into the implications of these discoveries and how they might inform our decision-making process. This marks a critical juncture in our presentation, as we begin to translate data insights into actionable strategies."
+    },
+    {
+      "slide_num": 8,
+      "type": "content",
+      "title": "Agent Patterns",
+      "bullets": [
+        "Concurrent Pattern: Multiple agents work on the same input in parallel.",
+        "Group-chat Pattern: Agents and optional humans interact via chat interface.",
+        "Handoff Pattern: Agents dynamically pass the control",
+        "Magentic Pattern: A central manager selects which special agent to invoke next Collector Pattern"
+      ],
+      "notes": "As we explore agent patterns, let's consider how multiple agents can work together to achieve a common goal, such as in the concurrent pattern where they process the same input in parallel. Another approach is the group-chat pattern, which enables agents and humans to interact through a chat interface, facilitating collaboration and information exchange. We also have patterns like handoff and magnetic, which allow for dynamic control transfer and selective agent invocation, respectively. These patterns offer a range of possibilities for designing effective agent interactions."
+    },
+    {
+      "slide_num": 9,
+      "type": "content",
+      "title": "Agent patterns contd.,",
+      "bullets": [
+        "Planner–Executor: Planner creates a plan and executor performs steps. A type of Hand-off pattern.",
+        "Reflex Agents: Respond to stimuli, they dont have memory. Used in chatbots, simple automation.",
+        "Hierarchical Agents: High-level agent delegates tasks. This is also a type of magentic pattern.",
+        "Autonomous Loop Agents:They have Continuous sense–think–act cycle"
+      ],
+      "notes": "As we continue exploring agent patterns, let's take a closer look at how they can be designed to interact with their environment. The Planner-Executor pattern is a great example of a Hand-off pattern, where a plan is created and then executed, a very sequential approach. In contrast, Reflex Agents respond immediately to stimuli without retaining any memory, making them ideal for applications like chatbots. This leads us to more complex patterns, such as Hierarchical and Autonomous Loop Agents, which we'll touch on next."
+    },
+    {
+      "slide_num": 10,
+      "type": "content",
+      "title": "Agent Patterns",
+      "bullets": [
+        "As we conclude our presentation, let's take a closer look at",
+        "Agent Patterns, which represent a crucial aspect of our overall architecture.",
+        "These patterns allow us to effectively manage and coordinate the",
+        "interactions between various components, ensuring a seamless and efficient experience."
+      ],
+      "notes": "As we conclude our presentation, let's take a closer look at Agent Patterns, which represent a crucial aspect of our overall architecture. These patterns allow us to effectively manage and coordinate the interactions between various components, ensuring a seamless and efficient experience. By leveraging Agent Patterns, we can create more scalable and resilient systems, capable of adapting to changing requirements and environments. This brings us full circle, highlighting the importance of intentional design in achieving our goals."
+    },
+    {
+      "slide_num": 11,
+      "type": "conclusion",
+      "title": "Conclusion: Introduction to Agentic AI",
+      "bullets": [
+        "Agentic AI is a paradigm shift in artificial intelligence, focusing on autonomous agents that can achieve goals",
+        "Understanding AI agents vs Agentic AI is crucial for effective implementation",
+        "The evolution of Agentic AI has led to the development of reference platform architectures",
+        "Agent patterns are essential for designing and building Agentic AI systems",
+        "Real-world applications of Agentic AI have the potential to transform industries"
+      ],
+      "notes": "In conclusion, Agentic AI has the potential to revolutionize the way we approach artificial intelligence. As we have discussed throughout this presentation, understanding the fundamentals of Agentic AI and its applications is essential for effective implementation. Thank you for your attention, and we welcome any questions you may have."
+    }
+  ]
+}

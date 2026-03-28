@@ -1,0 +1,162 @@
+"""Stage 7: Combine slide PNGs + MP3 audio into a final MP4 video using ffmpeg directly."""
+
+import os
+import glob
+import subprocess
+import imageio_ffmpeg
+from pipeline.checkpoint import CheckpointManager
+
+# Get ffmpeg path
+FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
+
+checkpoint_mgr = CheckpointManager()
+OUTPUT_DIR = os.path.join(checkpoint_mgr.base_dir, 'stage7_video')
+
+
+def _get_audio_duration(audio_path):
+    """Get duration of an MP3 file in seconds."""
+    try:
+        from moviepy.audio.io.AudioFileClip import AudioFileClip
+        clip = AudioFileClip(audio_path)
+        duration = clip.duration
+        clip.close()
+        return duration
+    except Exception:
+        return 3.0
+
+
+def create_video(filename):
+    """Stage 7: combine PNGs + MP3s into final MP4 using ffmpeg directly."""
+
+    if checkpoint_mgr.exists('stage7_video', filename):
+        cached = checkpoint_mgr.load('stage7_video', filename)
+        if cached and 'error' not in cached:
+            print(f'Valid Stage 7 checkpoint for {filename}')
+            return cached
+
+    # Load stage 5 and 6 checkpoints
+    stage5 = checkpoint_mgr.load('stage5_images', filename)
+    stage6 = checkpoint_mgr.load('stage6_audio', filename)
+
+    if not stage5:
+        raise Exception('Stage 5 checkpoint missing. Run Stage 5 first.')
+    if not stage6:
+        raise Exception('Stage 6 checkpoint missing. Run Stage 6 first.')
+
+    images_dir = stage5['output_dir']
+    audio_dir = stage6['output_dir']
+    slide_count = stage5['slide_count']
+
+    # Collect slide PNGs in order
+    images = sorted(glob.glob(os.path.join(images_dir, 'slide_*.png')))
+    if not images:
+        raise FileNotFoundError(f'No PNG images found in {images_dir}')
+
+    print(f'Stage 7: building video from {len(images)} slides...')
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUTPUT_DIR, f'{filename}.mp4')
+
+    # Process each slide: create video clip with audio, then concatenate
+    slide_clips = []
+    
+    for idx, img_path in enumerate(images, 1):
+        slide_num = idx
+        audio_path = os.path.join(audio_dir, f'slide_{slide_num:02d}.mp3')
+        
+        if os.path.exists(audio_path):
+            duration = _get_audio_duration(audio_path)
+            # Create slide video with audio using filter_complex
+            slide_clip_path = os.path.join(OUTPUT_DIR, f'slide_{slide_num:02d}.mp4')
+            
+            cmd = [
+                FFMPEG_PATH, '-y',
+                '-loop', '1', '-i', img_path,
+                '-i', audio_path,
+                '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+                '-c:a', 'aac', '-b:a', '128k',
+                '-shortest',
+                '-movflags', '+faststart',
+                '-t', str(duration),
+                slide_clip_path
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f'  Warning: slide {slide_num} failed, using fallback')
+                # Fallback: video without audio
+                cmd = [
+                    FFMPEG_PATH, '-y',
+                    '-loop', '1', '-i', img_path,
+                    '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+                    '-t', '3', '-shortest',
+                    slide_clip_path
+                ]
+                subprocess.run(cmd, capture_output=True)
+            
+            slide_clips.append(slide_clip_path)
+        else:
+            # No audio, create silent video
+            slide_clip_path = os.path.join(OUTPUT_DIR, f'slide_{slide_num:02d}.mp4')
+            cmd = [
+                FFMPEG_PATH, '-y',
+                '-loop', '1', '-i', img_path,
+                '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+                '-t', '3', '-shortest',
+                slide_clip_path
+            ]
+            subprocess.run(cmd, capture_output=True)
+            slide_clips.append(slide_clip_path)
+    
+    # Concatenate all slide videos
+    concat_list_path = os.path.join(OUTPUT_DIR, 'concat_list.txt')
+    with open(concat_list_path, 'w') as f:
+        for clip_path in slide_clips:
+            f.write(f"file '{clip_path}'\n")
+    
+    cmd = [
+        FFMPEG_PATH, '-y',
+        '-f', 'concat',
+        '-safe', '0',
+        '-i', concat_list_path,
+        '-c', 'copy',
+        out_path
+    ]
+    
+    print(f'  Concatenating {len(slide_clips)} slides...')
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'FFmpeg concat error: {result.stderr[:500]}')
+        # Fallback: copy first video
+        if slide_clips:
+            import shutil
+            shutil.copy(slide_clips[0], out_path)
+    
+    # Cleanup temp files
+    try:
+        for clip_path in slide_clips:
+            os.remove(clip_path)
+        os.remove(concat_list_path)
+    except:
+        pass
+
+    # Calculate total duration
+    total_duration = sum(
+        _get_audio_duration(os.path.join(audio_dir, f'slide_{i:02d}.mp3'))
+        for i in range(1, len(images) + 1)
+        if os.path.exists(os.path.join(audio_dir, f'slide_{i:02d}.mp3'))
+    )
+
+    print(f'Stage 7 complete: {out_path} ({total_duration:.1f}s total)')
+
+    result = {
+        'filename': filename,
+        'output_path': out_path,
+        'total_slides': len(images),
+        'total_duration_seconds': round(total_duration, 1),
+        'total_duration_minutes': round(total_duration / 60, 2),
+        'fps': 24,
+        'codec': 'libx264',
+    }
+    checkpoint_mgr.save('stage7_video', filename, result)
+    return result

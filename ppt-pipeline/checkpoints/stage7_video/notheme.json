@@ -1,0 +1,9 @@
+{
+  "filename": "notheme",
+  "output_path": "C:\\Users\\mdsam\\content_auto\\ppt-pipeline\\checkpoints\\stage7_video\\notheme.mp4",
+  "total_slides": 11,
+  "total_duration_seconds": 367.6,
+  "total_duration_minutes": 6.13,
+  "fps": 24,
+  "codec": "libx264"
+}
