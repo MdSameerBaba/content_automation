@@ -11,6 +11,7 @@ cd C:\Users\mdsam\content_auto
 py -3.12 -m venv .venv312
 .\.venv312\Scripts\Activate.ps1
 pip install -r .\ppt-pipeline\requirements.txt
+Copy-Item .\ppt-pipeline\.env.example .\ppt-pipeline\.env
 cd .\ppt-pipeline
 .\start_app.ps1
 ```
@@ -19,6 +20,7 @@ Important:
 
 - `start_app.ps1` expects Python at `../.venv312/Scripts/python.exe` relative to `ppt-pipeline/`.
 - Start the server from inside `ppt-pipeline/` when using `start_app.ps1`.
+- Add provider keys in `ppt-pipeline/.env` (copied from `.env.example`) before first run.
 - Default local URL is `http://localhost:5000`.
 
 ## 1) Recommended Daily Workflow

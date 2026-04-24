@@ -97,13 +97,34 @@ pip install -r requirements.txt
 
 ### 3) Configure environment
 
-Create `.env` in the project root (`ppt-pipeline/.env`):
+Create your local environment file at `ppt-pipeline/.env`.
+
+Recommended flow:
+
+```powershell
+# Run from workspace root
+Copy-Item .\ppt-pipeline\.env.example .\ppt-pipeline\.env
+```
+
+Which API keys do you need?
+
+- You need at least one working provider key: `GEMINI_API_KEY` or `GROQ_API_KEY` or `OPENROUTER_API_KEY`.
+- You can set multiple keys for fallback and keep `AI_PROVIDER_ORDER` aligned with the keys you actually configured.
+- If only one key is available, set provider order to that provider only.
+
+Provider portals to create keys:
+
+- Gemini: Google AI Studio
+- Groq: Groq Console
+- OpenRouter: OpenRouter Keys
+
+Example `.env`:
 
 ```env
-# Required: configure at least one provider
-GROQ_API_KEY=your_groq_api_key
-GEMINI_API_KEY=your_gemini_api_key
-OPENROUTER_API_KEY=your_openrouter_api_key
+# Required: set at least one API key
+GEMINI_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
+OPENROUTER_API_KEY=
 
 # Optional model overrides
 GROQ_MODEL=llama-3.3-70b-versatile
@@ -123,6 +144,8 @@ SILENCE_DURATION_MS=1500
 # Stage checkpoint reuse: 1 enabled (default), 0 disabled
 PIPELINE_USE_CACHE=1
 ```
+
+Do not commit real keys to Git.
 
 ### 4) Start the app
 
