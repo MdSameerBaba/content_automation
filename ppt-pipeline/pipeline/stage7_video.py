@@ -4,13 +4,47 @@ import os
 import glob
 import subprocess
 import imageio_ffmpeg
-from pipeline.checkpoint import CheckpointManager
+from pipeline.checkpoint import CheckpointManager, is_cache_reuse_enabled
 
 # Get ffmpeg path
 FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
 
 checkpoint_mgr = CheckpointManager()
 OUTPUT_DIR = os.path.join(checkpoint_mgr.base_dir, 'stage7_video')
+
+
+def _run_ffmpeg(cmd, context):
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f'{context} failed (exit {result.returncode}): {result.stderr[:500]}')
+    return result
+
+
+def _checkpoint_path(stage, filename):
+    return os.path.join(checkpoint_mgr.base_dir, stage, f'{filename}.json')
+
+
+def _is_cached_video_valid(filename, cached):
+    if not cached or 'error' in cached:
+        return False
+
+    out_path = cached.get('output_path')
+    if not out_path or not os.path.exists(out_path):
+        return False
+
+    stage7_cp = _checkpoint_path('stage7_video', filename)
+    stage5_cp = _checkpoint_path('stage5_images', filename)
+    stage6_cp = _checkpoint_path('stage6_audio', filename)
+    if not os.path.exists(stage7_cp):
+        return False
+
+    # If stage5/stage6 changed after stage7, rebuild video.
+    stage7_mtime = max(os.path.getmtime(stage7_cp), os.path.getmtime(out_path))
+    for dep in (stage5_cp, stage6_cp):
+        if os.path.exists(dep) and os.path.getmtime(dep) > stage7_mtime:
+            return False
+
+    return True
 
 
 def _get_audio_duration(audio_path):
@@ -25,14 +59,19 @@ def _get_audio_duration(audio_path):
         return 3.0
 
 
-def create_video(filename):
+def create_video(filename, force=False):
     """Stage 7: combine PNGs + MP3s into final MP4 using ffmpeg directly."""
 
-    if checkpoint_mgr.exists('stage7_video', filename):
-        cached = checkpoint_mgr.load('stage7_video', filename)
-        if cached and 'error' not in cached:
-            print(f'Valid Stage 7 checkpoint for {filename}')
-            return cached
+    cached = checkpoint_mgr.load('stage7_video', filename) if checkpoint_mgr.exists('stage7_video', filename) else None
+    cache_allowed = is_cache_reuse_enabled()
+    if cache_allowed and not force and _is_cached_video_valid(filename, cached):
+        print(f'Valid Stage 7 checkpoint for {filename}')
+        return cached
+
+    if force:
+        print(f'Forcing Stage 7 rebuild for {filename}...')
+    elif cached:
+        print(f'Stage 7 cache is stale for {filename}; rebuilding...')
 
     # Load stage 5 and 6 checkpoints
     stage5 = checkpoint_mgr.load('stage5_images', filename)
@@ -81,9 +120,10 @@ def create_video(filename):
                 slide_clip_path
             ]
             
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            if result.returncode != 0:
-                print(f'  Warning: slide {slide_num} failed, using fallback')
+            try:
+                _run_ffmpeg(cmd, f'slide {slide_num} video+audio render')
+            except Exception as render_err:
+                print(f'  Warning: {render_err}. Using fallback without audio.')
                 # Fallback: video without audio
                 cmd = [
                     FFMPEG_PATH, '-y',
@@ -92,7 +132,7 @@ def create_video(filename):
                     '-t', '3', '-shortest',
                     slide_clip_path
                 ]
-                subprocess.run(cmd, capture_output=True)
+                _run_ffmpeg(cmd, f'slide {slide_num} fallback render')
             
             slide_clips.append(slide_clip_path)
         else:
@@ -105,7 +145,7 @@ def create_video(filename):
                 '-t', '3', '-shortest',
                 slide_clip_path
             ]
-            subprocess.run(cmd, capture_output=True)
+            _run_ffmpeg(cmd, f'slide {slide_num} silent render')
             slide_clips.append(slide_clip_path)
     
     # Concatenate all slide videos
@@ -124,20 +164,29 @@ def create_video(filename):
     ]
     
     print(f'  Concatenating {len(slide_clips)} slides...')
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f'FFmpeg concat error: {result.stderr[:500]}')
+    try:
+        _run_ffmpeg(cmd, 'final video concat')
+    except Exception as concat_err:
+        print(f'FFmpeg concat warning: {concat_err}')
         # Fallback: copy first video
         if slide_clips:
             import shutil
-            shutil.copy(slide_clips[0], out_path)
+            try:
+                shutil.copy(slide_clips[0], out_path)
+            except Exception as copy_err:
+                raise RuntimeError(f'Final concat and fallback copy both failed: {copy_err}') from copy_err
+        else:
+            raise RuntimeError('Final concat failed and no slide clips were available for fallback copy.')
     
     # Cleanup temp files
     try:
         for clip_path in slide_clips:
-            os.remove(clip_path)
-        os.remove(concat_list_path)
-    except:
+            if os.path.exists(clip_path):
+                os.remove(clip_path)
+        if os.path.exists(concat_list_path):
+            os.remove(concat_list_path)
+    except OSError:
+        # Non-fatal cleanup issue.
         pass
 
     # Calculate total duration

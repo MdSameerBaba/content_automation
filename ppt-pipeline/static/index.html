@@ -135,6 +135,11 @@
       letter-spacing: 0.06em;
     }
 
+    .stage-badge.fallback {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+    }
+
     .stage-connector {
       width: 2px;
       height: 14px;
@@ -507,6 +512,197 @@
       margin-top: 12px;
       display: none;
     }
+
+    /* ── Collapsible History ── */
+    .history-section {
+      margin-top: 28px;
+    }
+    .history-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(57,73,171,0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background 0.15s;
+    }
+    .history-header:hover {
+      background: rgba(57,73,171,0.15);
+    }
+    .history-toggle {
+      font-size: 0.75rem;
+      color: #7986cb;
+      transition: transform 0.2s;
+    }
+    .history-toggle.expanded {
+      transform: rotate(90deg);
+    }
+    .history-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #a0aec0;
+    }
+    .history-count {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #4a5568;
+      background: rgba(57,73,171,0.2);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .history-content {
+      display: none;
+    }
+    .history-content.expanded {
+      display: block;
+    }
+    .history-item {
+      background: rgba(26,31,58,0.5);
+      border: 1px solid rgba(57,73,171,0.12);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .history-item:hover {
+      border-color: rgba(57,73,171,0.35);
+      background: rgba(57,73,171,0.08);
+    }
+    .history-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .history-item-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .history-item-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(57,73,171,0.25);
+      color: #7986cb;
+      text-transform: uppercase;
+    }
+    .history-item-badge.complete {
+      background: rgba(76,175,80,0.2);
+      color: #68d391;
+    }
+    .history-item-summary {
+      font-size: 0.78rem;
+      color: #718096;
+    }
+    .history-item-details {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(57,73,171,0.1);
+    }
+    .history-item.expanded .history-item-details {
+      display: block;
+    }
+
+    /* ── Current Stage Area ── */
+    .current-stage {
+      background: linear-gradient(135deg, rgba(57,73,171,0.12), rgba(121,134,203,0.05));
+      border: 1px solid rgba(57,73,171,0.25);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .current-stage-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .current-stage-badge {
+      background: #3949AB;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .current-stage-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .current-stage-desc {
+      font-size: 0.85rem;
+      color: #a0aec0;
+      margin-bottom: 16px;
+    }
+    .split-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .split-control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .split-control label {
+      font-size: 0.72rem;
+      color: #a0aec0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .split-control input {
+      width: 120px;
+      background: rgba(15, 18, 37, 0.7);
+      border: 1px solid rgba(121, 134, 203, 0.45);
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+    .split-hint {
+      font-size: 0.78rem;
+      color: #8c9ab6;
+      margin-bottom: 14px;
+    }
+    .split-preview-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+    .split-preview-item {
+      background: rgba(26,31,58,0.45);
+      border: 1px solid rgba(57,73,171,0.2);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .split-preview-title {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: #cbd5e0;
+      margin-bottom: 4px;
+    }
+    .split-preview-meta {
+      font-size: 0.74rem;
+      color: #8fa0be;
+    }
+    .split-warning {
+      font-size: 0.76rem;
+      color: #f59e0b;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -558,6 +754,7 @@
   <div class="stage-item disabled" id="stage-audio" onclick="runStage('audio')" title="Generate voiceover + SRT subtitles">
     <div class="stage-dot pending" id="dot-audio"></div>
     <span class="stage-name">6 · Audio</span>
+    <span class="stage-badge" id="audioEngineBadge" style="display:none;">KOKORO</span>
   </div>
   <div class="stage-connector"></div>
 
@@ -588,6 +785,9 @@
 
   <div id="errorBox" class="error-box"></div>
 
+  <!-- Current Stage Area -->
+  <div id="currentStageArea" style="display:none;"></div>
+
   <!-- Voice Selection -->
   <div id="voiceSelector" class="voice-selector" style="display:none;">
     <h3>🎤 Select Voice</h3>
@@ -596,14 +796,12 @@
     <div class="voice-selected" id="voiceSelected">
       Selected: <span id="selectedVoiceName">Heart (Female)</span>
     </div>
+    <div class="voice-selected" id="previewEngineInfo" style="display:none;"></div>
     <button class="btn-primary" onclick="confirmVoice()">Confirm & Generate Audio</button>
   </div>
 
-  <div id="slideTableContainer"></div>
-  <div id="resultPanel"></div>
-
   <!-- Human Review Gate: shown after Stage 4 completes -->
-  <div class="review-gate" id="reviewGate">
+  <div class="review-gate" id="reviewGate" style="display:none;">
     <h3>&#x1F50D; Human Review Gate &nbsp;<span class="step-pill">Stage 4 → 5</span></h3>
     <p class="gate-desc">
       The AI has built your PPTX with speaker notes (= narration script). Download it, review and
@@ -629,20 +827,145 @@
     <div class="revised-status" id="revisedStatus"></div>
   </div>
 
+  <!-- Collapsible History -->
+  <div class="history-section" id="historySection" style="display:none;">
+    <div class="history-header" onclick="toggleHistory()">
+      <span class="history-toggle" id="historyToggle">▶</span>
+      <span class="history-title">History</span>
+      <span class="history-count" id="historyCount">0</span>
+    </div>
+    <div class="history-content" id="historyContent"></div>
+  </div>
+
 
 <script>
   /* ── State ── */
   let currentFilename = null;
   let activeStage = null;
+  let stageHistory = [];
+  let currentAudioEngine = null;
+  let currentAudioFallbackUsed = false;
+  let audioEngineCheckpointLoading = false;
+  let structureReviewPending = false;
+  let latestStructureResult = null;
 
   const STAGE_MAP = {
-    structure: { prev: 'stage1_parsed',    endpoint: '/pipeline/structure', dotId: 'dot-structure', itemId: 'stage-structure' },
-    content:   { prev: 'stage2_structured', endpoint: '/pipeline/content',   dotId: 'dot-content',   itemId: 'stage-content'   },
-    build:     { prev: 'stage3_content',    endpoint: '/pipeline/build',      dotId: 'dot-pptx',      itemId: 'stage-build'     },
-    images:    { prev: 'stage4_pptx',       endpoint: '/pipeline/images',     dotId: 'dot-images',    itemId: 'stage-images'    },
-    audio:     { prev: 'stage5_images',     endpoint: '/pipeline/audio',      dotId: 'dot-audio',     itemId: 'stage-audio'     },
-    video:     { prev: 'stage6_audio',      endpoint: '/pipeline/video',      dotId: 'dot-video',     itemId: 'stage-video'     },
+    structure: { prev: 'stage1_parsed',    endpoint: '/pipeline/structure', dotId: 'dot-structure', itemId: 'stage-structure', name: 'Structure' },
+    content:   { prev: 'stage2_structured', endpoint: '/pipeline/content',   dotId: 'dot-content',   itemId: 'stage-content',   name: 'Content' },
+    build:     { prev: 'stage3_content',    endpoint: '/pipeline/build',      dotId: 'dot-pptx',      itemId: 'stage-build',     name: 'Build PPTX' },
+    images:    { prev: 'stage4_pptx',       endpoint: '/pipeline/images',     dotId: 'dot-images',    itemId: 'stage-images',    name: 'Images' },
+    audio:     { prev: 'stage5_images',     endpoint: '/pipeline/audio',      dotId: 'dot-audio',     itemId: 'stage-audio',     name: 'Audio' },
+    video:     { prev: 'stage6_audio',      endpoint: '/pipeline/video',      dotId: 'dot-video',     itemId: 'stage-video',     name: 'Video' },
   };
+
+  const STAGE_LABELS = {
+    parse: 'Parse',
+    structure: 'Structure',
+    content: 'Content',
+    build: 'Build PPTX',
+    images: 'Images',
+    audio: 'Audio',
+    video: 'Video'
+  };
+
+  function derivePrimaryEngineFromSummary(summary) {
+    if (!summary || typeof summary !== 'object') return null;
+    const entries = Object.entries(summary).filter(([key, count]) => key && Number(count) > 0 && key !== 'silence');
+    if (entries.length === 0) return null;
+    entries.sort((a, b) => b[1] - a[1]);
+    return entries[0][0];
+  }
+
+  function getStructureSplitOptions() {
+    const minInput = document.getElementById('structureMinSlides');
+    const maxInput = document.getElementById('structureMaxSlides');
+
+    let minSlides = Number(minInput?.value ?? 10);
+    let maxSlides = Number(maxInput?.value ?? 15);
+
+    if (!Number.isFinite(minSlides) || minSlides < 1) minSlides = 10;
+    if (!Number.isFinite(maxSlides) || maxSlides < minSlides) maxSlides = Math.max(minSlides, 15);
+
+    if (minInput) minInput.value = String(minSlides);
+    if (maxInput) maxInput.value = String(maxSlides);
+
+    return {
+      mode: 'custom',
+      min_slides: minSlides,
+      max_slides: maxSlides,
+    };
+  }
+
+  function buildSplitPreviewHtml(splitPlan) {
+    if (!splitPlan || !Array.isArray(splitPlan.parts) || splitPlan.parts.length === 0) {
+      return '<div class="split-hint">No parts preview available yet.</div>';
+    }
+
+    let warningHtml = '';
+    if (Array.isArray(splitPlan.unsplittable_sections) && splitPlan.unsplittable_sections.length > 0) {
+      const warningText = splitPlan.unsplittable_sections
+        .map(s => `${s.section_title} (${s.slide_count} slides)`)
+        .join(', ');
+      warningHtml = `<div class="split-warning">Sections kept intact above max range: ${warningText}</div>`;
+    }
+
+    const cards = splitPlan.parts.map(p => {
+      const sectionCount = Array.isArray(p.section_titles) ? p.section_titles.length : 0;
+      return `
+        <div class="split-preview-item">
+          <div class="split-preview-title">Part ${p.part}: Slides ${p.start_slide}-${p.end_slide}</div>
+          <div class="split-preview-meta">${p.slide_count} slides • ${sectionCount} section(s)</div>
+        </div>
+      `;
+    }).join('');
+
+    return `${warningHtml}<div class="split-preview-list">${cards}</div>`;
+  }
+
+  function setAudioEngineBadge(engine, fallbackUsed = false) {
+    const badge = document.getElementById('audioEngineBadge');
+    if (!badge) return;
+
+    if (!engine) {
+      badge.style.display = 'none';
+      badge.textContent = '';
+      badge.classList.remove('fallback');
+      badge.removeAttribute('title');
+      return;
+    }
+
+    const normalized = String(engine).toUpperCase();
+    const showFallbackStyle = fallbackUsed || normalized !== 'KOKORO';
+    badge.style.display = 'inline-block';
+    badge.textContent = normalized;
+    badge.classList.toggle('fallback', showFallbackStyle);
+    badge.title = showFallbackStyle
+      ? `Primary audio engine: ${normalized} (fallback used or non-Kokoro output)`
+      : `Primary audio engine: ${normalized}`;
+  }
+
+  function applyAudioEngineFromPayload(payload) {
+    const primary = payload?.primary_engine || derivePrimaryEngineFromSummary(payload?.engine_summary) || 'unknown';
+    const fallbackUsed = Boolean(payload?.fallback_used) || String(primary).toLowerCase() !== 'kokoro';
+    currentAudioEngine = primary;
+    currentAudioFallbackUsed = fallbackUsed;
+    setAudioEngineBadge(primary, fallbackUsed);
+  }
+
+  async function hydrateAudioEngineBadgeFromCheckpoint() {
+    if (!currentFilename || audioEngineCheckpointLoading) return;
+    audioEngineCheckpointLoading = true;
+    try {
+      const res = await fetch(`/checkpoint/stage6_audio/${currentFilename}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      applyAudioEngineFromPayload(data || {});
+    } catch (e) {
+      // Keep UI usable even if checkpoint hydration fails.
+    } finally {
+      audioEngineCheckpointLoading = false;
+    }
+  }
 
   /* ── Upload zone ── */
   const uploadZone = document.getElementById('uploadZone');
@@ -658,12 +981,27 @@
   });
   fileInput.addEventListener('change', handleUpload);
 
+  function getErrorMessage(data, fallback='Unknown error') {
+    if (!data) return fallback;
+    if (typeof data.error === 'string' && data.error.trim()) return data.error;
+    if (data.error && typeof data.error.message === 'string' && data.error.message.trim()) return data.error.message;
+    return fallback;
+  }
+
+  function getErrorTrace(data) {
+    if (!data) return '';
+    if (typeof data.traceback === 'string') return data.traceback;
+    if (data.error && typeof data.error.traceback === 'string') return data.error.traceback;
+    return '';
+  }
+
   function handleUpload() {
     const file = fileInput.files[0];
     if (!file || !file.name.toLowerCase().endsWith('.pdf')) { showError('Please upload a PDF file.'); return; }
 
     clearError();
     resetProgress();
+    setAudioEngineBadge(null);
     showStatus('Uploading and parsing PDF…');
     setDot('dot-parse', 'running');
     showLoading('Parsing PDF slides…');
@@ -675,11 +1013,25 @@
       .then(r => r.json())
       .then(data => {
         hideLoading();
-        if (data.error) { setDot('dot-parse', 'error'); showError(data.error); return; }
+        if (data.error || data.success === false) {
+          setDot('dot-parse', 'error');
+          showError(getErrorMessage(data, 'Upload failed'));
+          return;
+        }
         currentFilename = data.filename;
         setDot('dot-parse', 'complete');
+        
+        document.getElementById('uploadZone').style.display = 'none';
+        
+        stageHistory = [];
+        addToHistory('parse', {
+          slides: data.slides,
+          page_count: data.page_count,
+          filename: data.filename
+        }, `${data.page_count} slides parsed`);
+        
         showStatus(`✓ Parsed "${data.filename}" — ${data.page_count} slide(s) found`);
-        renderSlideTable(data.slides);
+        updateCurrentStage('structure', 'Group slides into sections with AI');
         fetchStatus();
       })
       .catch(() => { hideLoading(); setDot('dot-parse', 'error'); showError('Upload failed. Is the server running?'); });
@@ -726,6 +1078,7 @@
 
   async function playPreview(vid) {
     const btn = document.getElementById('preview-' + vid);
+    const info = document.getElementById('previewEngineInfo');
     btn.disabled = true;
     btn.textContent = '⏳ Generating...';
     
@@ -738,6 +1091,14 @@
       const data = await res.json();
       
       if (data.success && data.result.preview_url) {
+        const engine = (data.result.engine || 'unknown').toUpperCase();
+        let message = `Preview engine: ${engine}`;
+        if (data.result.warning) {
+          message += ` • ${data.result.warning}`;
+        }
+        info.style.display = 'block';
+        info.textContent = message;
+
         const audio = new Audio(data.result.preview_url);
         audio.onended = () => {
           btn.disabled = false;
@@ -747,11 +1108,15 @@
       } else {
         btn.disabled = false;
         btn.textContent = '❌ Failed';
+        info.style.display = 'block';
+        info.textContent = getErrorMessage(data, 'Preview generation failed');
         setTimeout(() => btn.textContent = '▶ Preview', 2000);
       }
     } catch (e) {
       btn.disabled = false;
       btn.textContent = '❌ Error';
+      info.style.display = 'block';
+      info.textContent = 'Preview request failed';
       setTimeout(() => btn.textContent = '▶ Preview', 2000);
     }
   }
@@ -762,15 +1127,43 @@
   }
 
   /* ── Run a pipeline stage ── */
-  function runStage(stage) {
+  function runStage(stage, forceVideo = false) {
+    const desc = {
+      structure: 'Group slides into sections with AI',
+      content: 'AI fills gaps + writes speaker notes',
+      build: 'Build themed PPTX from template',
+      images: 'Export slides as PNG images',
+    };
+
+    if (stage === 'structure') {
+      const hasControls = document.getElementById('structureMinSlides') && document.getElementById('structureMaxSlides');
+      if (!hasControls) {
+        updateCurrentStage('structure', desc.structure);
+        return;
+      }
+      const splitOptions = getStructureSplitOptions();
+      runStageWithVoice('structure', null, false, splitOptions);
+      return;
+    }
+
     if (stage === 'audio') {
       showVoiceSelector();
       return;
     }
-    runStageWithVoice(stage, null);
+    if (stage === 'video') {
+      runStageWithVoice('video', null, forceVideo);
+      return;
+    }
+
+    if (stage === 'content') {
+      structureReviewPending = false;
+    }
+
+    updateCurrentStage(stage, desc[stage] || 'Run stage');
+    runStageWithVoice(stage, null, false, null);
   }
 
-  function runStageWithVoice(stage, voice) {
+  function runStageWithVoice(stage, voice, forceVideo = false, splitOptions = null) {
     if (!currentFilename || activeStage) return;
 
     const cfg = STAGE_MAP[stage];
@@ -781,7 +1174,6 @@
 
     activeStage = stage;
     clearError();
-    document.getElementById('resultPanel').innerHTML = '';
     setDot(cfg.dotId, 'running');
     item.classList.add('running');
 
@@ -800,6 +1192,14 @@
     if (voice) {
       fetchOptions.headers = {'Content-Type': 'application/json'};
       fetchOptions.body = JSON.stringify({voice: voice});
+    } else if (stage === 'video' && forceVideo) {
+      fetchOptions.headers = {'Content-Type': 'application/json'};
+      fetchOptions.body = JSON.stringify({force: true});
+    } else if (stage === 'structure') {
+      fetchOptions.headers = {'Content-Type': 'application/json'};
+      fetchOptions.body = JSON.stringify({
+        split_options: splitOptions || { mode: 'auto', min_slides: 10, max_slides: 15 }
+      });
     }
     
     fetch(`${cfg.endpoint}/${currentFilename}`, fetchOptions)
@@ -811,7 +1211,9 @@
 
         if (data.success === false || data.error) {
           setDot(cfg.dotId, 'error');
-          showError((data.error || 'Unknown error') + (data.traceback ? '\n\n' + data.traceback : ''));
+          const errMsg = getErrorMessage(data);
+          const errTrace = getErrorTrace(data);
+          showError(errMsg + (errTrace ? '\n\n' + errTrace : ''));
           showStatus('Stage failed — see error below');
           fetchStatus();
           return;
@@ -819,7 +1221,35 @@
 
         setDot(cfg.dotId, 'complete');
         showStatus(`✓ Stage "${stage}" complete!`);
-        renderResult(stage, data);
+
+        if (stage === 'audio') {
+          applyAudioEngineFromPayload(data.result || {});
+        }
+
+        if (stage === 'structure') {
+          latestStructureResult = data.result || {};
+          structureReviewPending = true;
+        }
+        
+        const summary = getStageSummary(stage, data);
+        addToHistory(stage, data, summary);
+        
+        if (stage === 'build') {
+          document.getElementById('reviewGate').style.display = 'block';
+          document.getElementById('revisedStatus').style.display = 'none';
+        }
+
+        if (stage === 'structure') {
+          showStructureReadyCard(data.result || {});
+        } else if (stage === 'video') {
+          showVideoReadyCard(data.result || {});
+        } else {
+          const nextStage = getNextStage(stage);
+          if (nextStage) {
+            updateCurrentStage(nextStage.stage, nextStage.desc);
+          }
+        }
+        
         fetchStatus();
       })
       .catch(err => {
@@ -830,6 +1260,250 @@
         showError('Network error: ' + err.message);
         fetchStatus();
       });
+  }
+
+  function getNextStage(current) {
+    const next = {
+      structure: { stage: 'content', desc: 'AI fills gaps + writes speaker notes' },
+      content:   { stage: 'build', desc: 'Build themed PPTX from template' },
+      build:     { stage: 'images', desc: 'Export slides as PNG images' },
+      images:    { stage: 'audio', desc: 'Generate voiceover + SRT subtitles' },
+      audio:     { stage: 'video', desc: 'Assemble final MP4 video' },
+    };
+    return next[current];
+  }
+
+  function updateCurrentStage(stage, desc) {
+    const area = document.getElementById('currentStageArea');
+    area.style.display = 'block';
+    
+    let actionHtml = '';
+    if (stage === 'structure') {
+      actionHtml = `
+        <div class="split-controls">
+          <div class="split-control">
+            <label for="structureMinSlides">Min Slides / Part</label>
+            <input id="structureMinSlides" type="number" min="1" value="10">
+          </div>
+          <div class="split-control">
+            <label for="structureMaxSlides">Max Slides / Part</label>
+            <input id="structureMaxSlides" type="number" min="1" value="15">
+          </div>
+        </div>
+        <div class="split-hint">Default preview uses 10-15 slides per part. Sections are never split across parts.</div>
+        <button class="btn-download" onclick="runStage('structure')">▶ Run Structure + Preview Parts</button>
+      `;
+    } else if (stage === 'audio') {
+      actionHtml = `<button class="btn-download" onclick="runStage('audio')">&#x1F3A4; Generate Audio</button>`;
+    } else if (stage === 'video') {
+      actionHtml = `<button class="btn-download" onclick="runStage('video')">&#x1F3AC; Generate Video</button>`;
+    } else {
+      actionHtml = `<button class="btn-download" onclick="runStage('${stage}')">▶ Run ${STAGE_LABELS[stage]}</button>`;
+    }
+    
+    area.innerHTML = `
+      <div class="current-stage">
+        <div class="current-stage-header">
+          <span class="current-stage-badge">Current Stage</span>
+        </div>
+        <div class="current-stage-title">${STAGE_LABELS[stage]}</div>
+        <div class="current-stage-desc">${desc}</div>
+        ${actionHtml}
+      </div>
+    `;
+  }
+
+  function showStructureReadyCard(structureResult = {}) {
+    const area = document.getElementById('currentStageArea');
+    area.style.display = 'block';
+
+    const splitPlan = structureResult.split_plan || {};
+    const splitConfig = structureResult.split_config || { min_slides: 10, max_slides: 15 };
+    const partCount = splitPlan.part_count || 0;
+    const splitPreviewHtml = buildSplitPreviewHtml(splitPlan);
+
+    area.innerHTML = `
+      <div class="current-stage">
+        <div class="current-stage-header">
+          <span class="current-stage-badge">Review Split</span>
+        </div>
+        <div class="current-stage-title">Structure Ready (${partCount} part${partCount === 1 ? '' : 's'})</div>
+        <div class="current-stage-desc">Preview generated with ${splitConfig.min_slides}-${splitConfig.max_slides} slides per part. Logical sections remain intact.</div>
+        ${splitPreviewHtml}
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+          <button class="btn-download" onclick="proceedToContent()">▶ Continue to Content Stage</button>
+          <button class="btn-skip" onclick="updateCurrentStage('structure', 'Group slides into sections with AI')">⚙ Adjust Split & Re-run</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function proceedToContent() {
+    structureReviewPending = false;
+    updateCurrentStage('content', 'AI fills gaps + writes speaker notes');
+  }
+
+  function showVideoReadyCard(videoResult = {}) {
+    const area = document.getElementById('currentStageArea');
+    area.style.display = 'block';
+
+    const durationText = videoResult.total_duration_seconds
+      ? `${videoResult.total_duration_seconds}s total duration.`
+      : 'Ready to download.';
+
+    area.innerHTML = `
+      <div class="current-stage">
+        <div class="current-stage-header">
+          <span class="current-stage-badge">Completed</span>
+        </div>
+        <div class="current-stage-title">Video Ready</div>
+        <div class="current-stage-desc">Your MP4 has been generated. ${durationText}</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-download" onclick="downloadVideo()">&#x2B07; Download MP4</button>
+          <button class="btn-skip" onclick="runStage('video', true)">&#x21bb; Re-generate Video</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function formatEngineSummary(summary) {
+    if (!summary || typeof summary !== 'object') return '—';
+    const parts = [];
+    for (const [engine, count] of Object.entries(summary)) {
+      parts.push(`${engine}:${count}`);
+    }
+    return parts.length ? parts.join(', ') : '—';
+  }
+
+  function addToHistory(stage, data, summary) {
+    stageHistory.push({ stage, data, summary });
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const section = document.getElementById('historySection');
+    const content = document.getElementById('historyContent');
+    const count = document.getElementById('historyCount');
+    
+    if (stageHistory.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+    
+    section.style.display = 'block';
+    count.textContent = stageHistory.length;
+    
+    let html = '';
+    for (let i = 0; i < stageHistory.length; i++) {
+      const h = stageHistory[i];
+      const label = STAGE_LABELS[h.stage] || h.stage;
+      html += `
+        <div class="history-item" onclick="toggleHistoryItem(this)">
+          <div class="history-item-header">
+            <span class="history-item-title">
+              <span class="history-item-badge complete">✓</span>
+              ${label}
+            </span>
+          </div>
+          <div class="history-item-summary">${h.summary}</div>
+          <div class="history-item-details">${renderHistoryDetails(h.stage, h.data)}</div>
+        </div>
+      `;
+    }
+    content.innerHTML = html;
+  }
+
+  function renderHistoryDetails(stage, data) {
+    if (stage === 'parse') {
+      return `<div class="result-panel" style="margin-top:10px">
+        <div class="result-row"><span>Filename</span><span class="result-val">${data.filename}</span></div>
+        <div class="result-row"><span>Slides</span><span class="result-val">${data.page_count}</span></div>
+      </div>`;
+    }
+    
+    const r = data.result || {};
+    let rows = [];
+    
+    if (stage === 'structure') {
+      const splitPlan = r.split_plan || {};
+      const partRanges = Array.isArray(splitPlan.parts)
+        ? splitPlan.parts.map(p => `P${p.part}: ${p.start_slide}-${p.end_slide}`).join(' | ')
+        : '—';
+      rows = [
+        ['Sections', (r.toc || []).join(', ') || '—'],
+        ['Groups', (r.groups || []).length],
+        ['Parts', splitPlan.part_count || '—'],
+        ['Ranges', partRanges || '—'],
+      ];
+    } else if (stage === 'content') {
+      rows = [
+        ['Title', data.audit?.presentation_title || '—'],
+        ['Missing slides added', (data.missing_slides || []).length || 'None'],
+        ['Speaker notes', data.speaker_notes_count],
+        ['Final slides', data.final_slides],
+      ];
+    } else if (stage === 'build') {
+      rows = [
+        ['Total slides', r.total_slides || '—'],
+        ['Narrator words', r.narrator_words || '—'],
+        ['Duration', r.estimated_minutes ? r.estimated_minutes + ' min' : '—'],
+      ];
+    } else if (stage === 'images') {
+      rows = [
+        ['Slides exported', r.slide_count || '—'],
+      ];
+    } else if (stage === 'audio') {
+      rows = [
+        ['Audio files', r.slide_count || '—'],
+        ['Total words', r.total_words || '—'],
+        ['Voice', r.voice || '—'],
+        ['Engine summary', formatEngineSummary(r.engine_summary)],
+      ];
+    } else if (stage === 'video') {
+      rows = [
+        ['Duration', r.total_duration_seconds ? r.total_duration_seconds + 's' : '—'],
+        ['Resolution', r.fps ? r.fps + ' fps' : '—'],
+      ];
+    }
+    
+    let html = '<div class="result-panel" style="margin-top:10px">';
+    for (const [k, v] of rows) {
+      html += `<div class="result-row"><span>${k}</span><span class="result-val">${v}</span></div>`;
+    }
+    if (stage === 'video') {
+      html += `<div class="result-row"><span>Download</span><span class="result-val"><button class="btn-download" onclick="downloadVideo()">&#x2B07; MP4</button></span></div>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function getStageSummary(stage, data) {
+    const r = data.result || {};
+    if (stage === 'structure') {
+      const parts = r.split_plan?.part_count;
+      if (parts) return `${(r.groups || []).length} groups, ${parts} parts`;
+      return `${(r.groups || []).length} groups created`;
+    }
+    if (stage === 'content') return `${data.final_slides} slides, ${data.speaker_notes_count} notes`;
+    if (stage === 'build') return `${r.total_slides} slides built`;
+    if (stage === 'images') return `${r.slide_count} images exported`;
+    if (stage === 'audio') {
+      const engine = r.primary_engine ? ` (${r.primary_engine})` : '';
+      return `${r.slide_count} audio files generated${engine}`;
+    }
+    if (stage === 'video') return `Video ready (${r.total_duration_seconds}s)`;
+    return 'Complete';
+  }
+
+  function toggleHistory() {
+    const content = document.getElementById('historyContent');
+    const toggle = document.getElementById('historyToggle');
+    content.classList.toggle('expanded');
+    toggle.classList.toggle('expanded');
+  }
+
+  function toggleHistoryItem(el) {
+    el.classList.toggle('expanded');
   }
 
   /* ── Fetch pipeline status + update sidebar ── */
@@ -853,6 +1527,40 @@
         setEnabled('stage-images',    status.stage4_pptx);
         setEnabled('stage-audio',     status.stage5_images);
         setEnabled('stage-video',     status.stage6_audio);
+
+        if (status.stage6_audio) {
+          if (currentAudioEngine) {
+            setAudioEngineBadge(currentAudioEngine, currentAudioFallbackUsed);
+          } else {
+            hydrateAudioEngineBadgeFromCheckpoint();
+          }
+        } else {
+          currentAudioEngine = null;
+          currentAudioFallbackUsed = false;
+          setAudioEngineBadge(null);
+        }
+        
+        if (!activeStage && currentFilename) {
+          if (!status.stage1_parsed) {
+            // No stage selected yet
+          } else if (!status.stage2_structured) {
+            updateCurrentStage('structure', 'Group slides into sections with AI');
+          } else if (structureReviewPending && !status.stage3_content) {
+            showStructureReadyCard(latestStructureResult || {});
+          } else if (!status.stage3_content) {
+            updateCurrentStage('content', 'AI fills gaps + writes speaker notes');
+          } else if (!status.stage4_pptx) {
+            updateCurrentStage('build', 'Build themed PPTX from template');
+          } else if (!status.stage5_images) {
+            updateCurrentStage('images', 'Export slides as PNG images');
+          } else if (!status.stage6_audio) {
+            updateCurrentStage('audio', 'Generate voiceover + SRT subtitles');
+          } else if (!status.stage7_video) {
+            updateCurrentStage('video', 'Assemble final MP4 video');
+          } else {
+            showVideoReadyCard();
+          }
+        }
       });
   }
 
@@ -875,6 +1583,9 @@
       .forEach(id => setDot(id, 'pending'));
     ['stage-structure','stage-content','stage-build','stage-images','stage-audio','stage-video']
       .forEach(id => setEnabled(id, false));
+    currentAudioEngine = null;
+    currentAudioFallbackUsed = false;
+    setAudioEngineBadge(null);
   }
 
   function showStatus(msg) {
@@ -904,81 +1615,6 @@
     document.getElementById('loadingOverlay').style.display = 'none';
   }
 
-  function renderSlideTable(slides) {
-    if (!slides || !slides.length) { document.getElementById('slideTableContainer').innerHTML = ''; return; }
-    let html = '<div class="section-title" style="margin-top:0">Parsed Slides</div>';
-    html += '<table class="slide-table"><thead><tr><th>#</th><th>Detected Title</th><th>Words</th></tr></thead><tbody>';
-    for (const s of slides) {
-      html += `<tr><td><span class="slide-num-badge">${s.slide_num}</span></td><td>${s.title || '<em style="color:#4a5568">—</em>'}</td><td>${s.word_count}</td></tr>`;
-    }
-    html += '</tbody></table>';
-    document.getElementById('slideTableContainer').innerHTML = html;
-  }
-
-  function renderResult(stage, data) {
-    const panel = document.getElementById('resultPanel');
-    let rows = [];
-
-    if (stage === 'structure') {
-      const r = data.result || {};
-      rows = [
-        ['Sections (TOC)', (r.toc || []).join(', ') || '—'],
-        ['Groups', (r.groups || []).length],
-        ['Unassigned slides', (r.unassigned_slides || []).length || 'None'],
-      ];
-    } else if (stage === 'content') {
-      rows = [
-        ['Presentation title', data.audit?.presentation_title || '—'],
-        ['Has title slide', data.audit?.has_title_slide ? '✓ Yes' : '✗ No'],
-        ['Has agenda slide', data.audit?.has_agenda_slide ? '✓ Yes' : '✗ No'],
-        ['Has conclusion', data.audit?.has_conclusion_slide ? '✓ Yes' : '✗ No'],
-        ['Generated missing slides', (data.missing_slides || []).map(s => s.slide_type).join(', ') || 'None'],
-        ['Speaker notes written', data.speaker_notes_count],
-        ['Final slide count', data.final_slides],
-      ];
-    } else if (stage === 'build') {
-      const r = data.result || {};
-      rows = [
-        ['Total slides', r.total_slides || '—'],
-        ['Narrator words', r.narrator_words || '—'],
-        ['Estimated duration', r.estimated_minutes ? r.estimated_minutes + ' min' : '—'],
-      ];
-      document.getElementById('reviewGate').style.display = 'block';
-      document.getElementById('revisedStatus').style.display = 'none';
-    } else if (stage === 'images') {
-      const r = data.result || {};
-      rows = [
-        ['Slides exported', r.slide_count || '—'],
-        ['Method', r.method || '—'],
-      ];
-    } else if (stage === 'audio') {
-      const r = data.result || {};
-      rows = [
-        ['Audio files', r.slide_count || '—'],
-        ['Total words', r.total_words || '—'],
-        ['Voice', r.voice || '—'],
-      ];
-    } else if (stage === 'video') {
-      const r = data.result || {};
-      rows = [
-        ['Total slides', r.total_slides || '—'],
-        ['Video duration', r.total_duration_seconds ? r.total_duration_seconds + 's (' + r.total_duration_minutes + ' min)' : '—'],
-        ['Resolution', r.fps ? r.fps + ' fps' : '—'],
-        ['Codec', r.codec || '—'],
-      ];
-      // Add download button for video
-      rows.push(['Download', `<button class="btn-download" onclick="downloadVideo()">&#x2B07; Download MP4</button>`]);
-    } else {
-      rows = [['Status', 'Complete ✓']];
-    }
-
-    let html = `<div class="result-panel"><h3>Stage "${stage}" Result</h3>`;
-    for (const [k, v] of rows) {
-      html += `<div class="result-row"><span>${k}</span><span class="result-val">${v}</span></div>`;
-    }
-    html += '</div>';
-    panel.innerHTML = html;
-  }
   function downloadPptx() {
     if (!currentFilename) return;
     window.location.href = `/download-pptx/${currentFilename}`;
@@ -990,10 +1626,10 @@
   }
 
   function skipReview() {
-    // No upload needed — stages 5-7 will use the AI-generated PPTX
     document.getElementById('reviewGate').style.display = 'none';
     showStatus('Skipped review — AI-generated PPTX will be used for stages 5–7.');
     setEnabled('stage-images', true);
+    updateCurrentStage('images', 'Export slides as PNG images');
   }
 
   async function uploadRevised(file) {
@@ -1018,8 +1654,10 @@
         status.textContent = `✓ ${data.message}`;
         showStatus('✓ Revised PPTX uploaded — ready for Stage 5.');
         setEnabled('stage-images', true);
+        document.getElementById('reviewGate').style.display = 'none';
+        updateCurrentStage('images', 'Export slides as PNG images');
       } else {
-        showError(data.error || 'Upload failed.');
+        showError(getErrorMessage(data, 'Upload failed.'));
       }
     } catch(e) {
       hideLoading();

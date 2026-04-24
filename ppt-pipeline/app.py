@@ -1,4 +1,5 @@
 import os
+import sys
 import traceback
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from pipeline.stage1_parser import parse_pdf
@@ -12,6 +13,19 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 checkpoint_mgr = CheckpointManager()
 
 
+def error_response(code, message, status=500, include_trace=False):
+    payload = {
+        'success': False,
+        'error': {
+            'code': code,
+            'message': message,
+        }
+    }
+    if include_trace:
+        payload['error']['traceback'] = traceback.format_exc()
+    return jsonify(payload), status
+
+
 @app.route('/')
 def index():
     return send_from_directory(app.static_folder, 'index.html')
@@ -20,14 +34,17 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return error_response('UPLOAD_MISSING_FILE', 'No file part', status=400)
     file = request.files['file']
     if file.filename == '' or not file.filename.lower().endswith('.pdf'):
-        return jsonify({'error': 'No selected PDF file'}), 400
+        return error_response('UPLOAD_INVALID_FILE', 'No selected PDF file', status=400)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(filepath)
-    result = parse_pdf(filepath)
-    return jsonify(result)
+    try:
+        file.save(filepath)
+        result = parse_pdf(filepath)
+        return jsonify(result)
+    except Exception as e:
+        return error_response('UPLOAD_PARSE_FAILED', str(e), include_trace=True)
 
 
 @app.route('/pipeline/status/<filename>')
@@ -46,7 +63,7 @@ def pipeline_status(filename):
 def get_checkpoint(stage, filename):
     data = checkpoint_mgr.load(stage, filename)
     if data is None:
-        return jsonify({'error': 'Checkpoint not found'}), 404
+        return error_response('CHECKPOINT_NOT_FOUND', 'Checkpoint not found', status=404)
     return jsonify(data)
 
 
@@ -56,17 +73,18 @@ def serve_checkpoint_file(filepath):
     from flask import send_from_directory
     base_dir = checkpoint_mgr.base_dir
     return send_from_directory(base_dir, filepath)
-    return jsonify(data)
 
 
 # ── Stage 2: Structure ───────────────────────────────────────────────
 @app.route('/pipeline/structure/<filename>', methods=['POST'])
 def run_structure(filename):
     try:
-        result = structure_slides(filename)
+        payload = request.get_json(silent=True) or {}
+        split_options = payload.get('split_options') if isinstance(payload, dict) else None
+        result = structure_slides(filename, split_options=split_options)
         return jsonify({'success': True, 'result': result})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return error_response('STAGE2_STRUCTURE_FAILED', str(e), include_trace=True)
 
 
 # ── Stage 3: Content / AI gap fill + speaker notes ──────────────────
@@ -79,11 +97,14 @@ def run_content(filename):
             'audit': result['audit'],
             'missing_slides': result['missing_slides_content'],
             'speaker_notes_count': len(result['speaker_notes']),
+            'speaker_notes_total_words': result.get('speaker_notes_total_words'),
+            'narration_policy': result.get('narration_policy'),
+            'stage3_runtime': result.get('stage3_runtime'),
             'original_slides': result['original_slide_count'],
             'final_slides': result['final_slide_count']
         })
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return error_response('STAGE3_CONTENT_FAILED', str(e), include_trace=True)
 
 
 # ── Stage 4: Build PPTX ─────────────────────────────────────────────
@@ -94,9 +115,9 @@ def run_build(filename):
         result = build_pptx(filename)
         return jsonify({'success': True, 'result': result})
     except ImportError:
-        return jsonify({'success': False, 'error': 'stage4_builder.py not created yet'}), 501
+        return error_response('STAGE4_NOT_AVAILABLE', 'stage4_builder.py not created yet', status=501)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return error_response('STAGE4_BUILD_FAILED', str(e), include_trace=True)
 
 
 # ── Download Stage 4 PPTX ───────────────────────────────────────────
@@ -105,7 +126,7 @@ def download_pptx(filename):
     """Serve the AI-generated PPTX for user to download and edit."""
     pptx_file = os.path.join(checkpoint_mgr.base_dir, 'stage4_pptx', f'{filename}.pptx')
     if not os.path.exists(pptx_file):
-        return jsonify({'error': 'PPTX not found. Run Stage 4 first.'}), 404
+        return error_response('PPTX_NOT_FOUND', 'PPTX not found. Run Stage 4 first.', status=404)
     return send_file(pptx_file, as_attachment=True,
                      download_name=f'{filename}_ai_generated.pptx',
                      mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation')
@@ -117,7 +138,7 @@ def download_video(filename):
     """Serve the final MP4 video for download."""
     video_file = os.path.join(checkpoint_mgr.base_dir, 'stage7_video', f'{filename}.mp4')
     if not os.path.exists(video_file):
-        return jsonify({'error': 'Video not found. Run Stage 7 first.'}), 404
+        return error_response('VIDEO_NOT_FOUND', 'Video not found. Run Stage 7 first.', status=404)
     return send_file(video_file, as_attachment=True,
                      download_name=f'{filename}_video.mp4',
                      mimetype='video/mp4')
@@ -132,13 +153,13 @@ def upload_revised_pptx():
     Speaker notes in the uploaded PPTX become the narration script.
     """
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return error_response('REVISED_UPLOAD_MISSING_FILE', 'No file part', status=400)
     file = request.files['file']
     filename = request.form.get('filename', '')
     if not filename:
-        return jsonify({'error': 'filename parameter required'}), 400
+        return error_response('REVISED_UPLOAD_MISSING_FILENAME', 'filename parameter required', status=400)
     if not file.filename.lower().endswith('.pptx'):
-        return jsonify({'error': 'Only .pptx files accepted'}), 400
+        return error_response('REVISED_UPLOAD_INVALID_FILE', 'Only .pptx files accepted', status=400)
 
     # Save to stage5_input as the authoritative source for stages 5-7
     input_dir = os.path.join(checkpoint_mgr.base_dir, 'stage5_input')
@@ -178,9 +199,9 @@ def run_images(filename):
         result = export_images(filename)
         return jsonify({'success': True, 'result': result})
     except ImportError:
-        return jsonify({'success': False, 'error': 'stage5_images.py not created yet'}), 501
+        return error_response('STAGE5_NOT_AVAILABLE', 'stage5_images.py not created yet', status=501)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return error_response('STAGE5_IMAGES_FAILED', str(e), include_trace=True)
 
 
 # ── Voice Selection ─────────────────────────────────────────────────
@@ -190,13 +211,13 @@ def get_voices():
         from pipeline.stage6_audio import get_voices, KOKORO_VOICES
         return jsonify({'success': True, 'voices': KOKORO_VOICES})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response('VOICE_LIST_FAILED', str(e), include_trace=True)
 
 
 @app.route('/voices/preview', methods=['POST'])
 def preview_voice():
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         voice_id = data.get('voice_id')
         custom_text = data.get('text')
         
@@ -204,11 +225,11 @@ def preview_voice():
         result = generate_preview(voice_id, custom_text)
         
         if 'error' in result:
-            return jsonify({'success': False, 'error': result['error']}), 400
+            return error_response('VOICE_PREVIEW_FAILED', result['error'], status=400)
         
         return jsonify({'success': True, 'result': result})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return error_response('VOICE_PREVIEW_EXCEPTION', str(e), include_trace=True)
 
 
 # ── Stage 6: Generate audio + SRT ───────────────────────────────────
@@ -221,9 +242,9 @@ def run_audio(filename):
         result = generate_audio(filename, voice=voice)
         return jsonify({'success': True, 'result': result})
     except ImportError:
-        return jsonify({'success': False, 'error': 'stage6_audio.py not created yet'}), 501
+        return error_response('STAGE6_NOT_AVAILABLE', 'stage6_audio.py not created yet', status=501)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return error_response('STAGE6_AUDIO_FAILED', str(e), include_trace=True)
 
 
 # ── Stage 7: Assemble MP4 video ─────────────────────────────────────
@@ -231,14 +252,22 @@ def run_audio(filename):
 def run_video(filename):
     try:
         from pipeline.stage7_video import create_video
-        result = create_video(filename)
+        data = request.get_json(silent=True) or {}
+        force = bool(data.get('force', False))
+        result = create_video(filename, force=force)
         return jsonify({'success': True, 'result': result})
     except ImportError:
-        return jsonify({'success': False, 'error': 'stage7_video.py not created yet'}), 501
+        return error_response('STAGE7_NOT_AVAILABLE', 'stage7_video.py not created yet', status=501)
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return error_response('STAGE7_VIDEO_FAILED', str(e), include_trace=True)
 
 
 if __name__ == '__main__':
+    required = (3, 12)
+    if sys.version_info[:2] != required:
+        raise SystemExit(
+            f'This app is locked to Python {required[0]}.{required[1]} for Kokoro compatibility. '
+            'Use the .venv312 environment to run app.py.'
+        )
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=True)

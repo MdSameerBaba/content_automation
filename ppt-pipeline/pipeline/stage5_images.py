@@ -4,10 +4,17 @@ import os
 import glob
 import shutil
 import subprocess
-from pipeline.checkpoint import CheckpointManager
+from pipeline.checkpoint import CheckpointManager, is_cache_reuse_enabled
 
 checkpoint_mgr = CheckpointManager()
 OUTPUT_DIR = os.path.join(checkpoint_mgr.base_dir, 'stage5_images')
+
+
+def _run_command(cmd, timeout, context):
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    if result.returncode != 0:
+        raise RuntimeError(f'{context} failed (exit {result.returncode}): {result.stderr[:500]}')
+    return result
 
 
 def _get_input_pptx(filename):
@@ -43,16 +50,23 @@ def _export_via_libreoffice(pptx_path, out_dir):
     # First convert to PDF (LibreOffice handles multi-page better)
     import tempfile
     temp_dir = tempfile.mkdtemp()
-    pdf_path = os.path.join(temp_dir, 'slides.pdf')
+    pdf_path = ''
     
     cmd = [soffice, '--headless', '--convert-to', 'pdf', '--outdir', temp_dir, pptx_path]
     print(f'  Converting to PDF: {" ".join(cmd)}')
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-    if result.returncode != 0:
-        raise RuntimeError(f'LibreOffice PDF error:\n{result.stderr}')
+    pdf_result = _run_command(cmd, timeout=120, context='LibreOffice PDF conversion')
+
+    generated_pdfs = sorted(glob.glob(os.path.join(temp_dir, '*.pdf')))
+    if generated_pdfs:
+        pdf_path = generated_pdfs[0]
     
-    if not os.path.exists(pdf_path):
-        raise RuntimeError(f'PDF not created at {pdf_path}')
+    if not pdf_path or not os.path.exists(pdf_path):
+        listing = ', '.join(os.listdir(temp_dir)) if os.path.exists(temp_dir) else '<temp dir missing>'
+        raise RuntimeError(
+            f'PDF not created by LibreOffice in {temp_dir}. '
+            f'Directory contents: [{listing}]. '
+            f'stdout: {pdf_result.stdout[:300]} stderr: {pdf_result.stderr[:300]}'
+        )
     
     # Now convert PDF to PNG using pdf2image or similar
     try:
@@ -65,15 +79,17 @@ def _export_via_libreoffice(pptx_path, out_dir):
         # Fallback: try direct PNG conversion with better options
         cmd = [soffice, '--headless', '--convert-to', 'png', '--outdir', out_dir, pptx_path]
         print(f'  Running: {" ".join(cmd)}')
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        if result.returncode != 0:
-            raise RuntimeError(f'LibreOffice error:\n{result.stderr}')
+        _run_command(cmd, timeout=120, context='LibreOffice PNG conversion')
     
     # Clean up temp
     try:
-        os.remove(pdf_path)
-        os.rmdir(temp_dir)
-    except:
+        for tmp_pdf in glob.glob(os.path.join(temp_dir, '*.pdf')):
+            if os.path.exists(tmp_pdf):
+                os.remove(tmp_pdf)
+        if os.path.exists(temp_dir):
+            os.rmdir(temp_dir)
+    except OSError:
+        # Non-fatal cleanup issue.
         pass
     
     return True
@@ -109,7 +125,7 @@ def _export_via_com(pptx_path, out_dir):
 def export_images(filename):
     """Stage 5: export each PPTX slide to a PNG image."""
 
-    if checkpoint_mgr.exists('stage5_images', filename):
+    if is_cache_reuse_enabled() and checkpoint_mgr.exists('stage5_images', filename):
         cached = checkpoint_mgr.load('stage5_images', filename)
         if cached and 'error' not in cached:
             print(f'Valid Stage 5 checkpoint for {filename}')
@@ -126,14 +142,20 @@ def export_images(filename):
     # Try COM first (Windows), fall back to LibreOffice
     slide_count = 0
     method_used = 'unknown'
+    export_errors = []
     try:
         print('  Trying PowerPoint COM export...')
         slide_count = _export_via_com(pptx_path, out_dir)
         method_used = 'PowerPoint COM'
     except Exception as com_err:
+        export_errors.append(f'COM export failed: {com_err}')
         print(f'  COM failed ({com_err}), trying LibreOffice...')
-        _export_via_libreoffice(pptx_path, out_dir)
-        method_used = 'LibreOffice'
+        try:
+            _export_via_libreoffice(pptx_path, out_dir)
+            method_used = 'LibreOffice'
+        except Exception as lo_err:
+            export_errors.append(f'LibreOffice export failed: {lo_err}')
+            raise RuntimeError('Stage 5 image export failed. ' + ' | '.join(export_errors)) from lo_err
 
     # Collect and rename exported PNGs to slide_01.png format
     pngs = sorted(glob.glob(os.path.join(out_dir, '*.png')))
@@ -146,6 +168,9 @@ def export_images(filename):
             os.rename(src, dst)
         renamed.append(dst)
     slide_count = len(renamed)
+
+    if slide_count == 0:
+        raise RuntimeError('Stage 5 produced zero PNGs. Check PowerPoint/LibreOffice export dependencies.')
 
     print(f'  Exported {slide_count} slides via {method_used} -> {out_dir}')
 

@@ -1,0 +1,23 @@
+{
+  "ai": {
+    "provider_order": [
+      "gemini",
+      "groq"
+    ],
+    "models": {
+      "groq": "llama-3.3-70b-versatile",
+      "gemini": "gemini-2.0-flash",
+      "openrouter": "anthropic/claude-sonnet-4-5"
+    },
+    "http": {
+      "timeout_seconds": 45,
+      "max_retries": 2,
+      "retry_backoff_seconds": 1.5
+    }
+  },
+  "tts": {
+    "default_voice": "af_heart",
+    "preview_text": "Hello! This is a preview of my voice. You can hear how I sound and choose the one you like best.",
+    "silence_duration_ms": 1500
+  }
+}
