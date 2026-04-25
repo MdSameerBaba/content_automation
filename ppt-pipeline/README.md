@@ -121,10 +121,13 @@ Provider portals to create keys:
 Example `.env`:
 
 ```env
-# Required: set at least one API key
+# Required: set at least one LLM API key
 GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 OPENROUTER_API_KEY=
+
+# Recommended for multilingual narration (Stage 6)
+SARVAM_API_KEY=your_sarvam_api_key_here
 
 # Optional model overrides
 GROQ_MODEL=llama-3.3-70b-versatile
@@ -139,7 +142,29 @@ AI_HTTP_RETRY_BACKOFF_SECONDS=1.5
 
 # Optional TTS defaults
 DEFAULT_VOICE=af_heart
+DEFAULT_TTS_PROVIDER=auto
+DEFAULT_TTS_LANGUAGE=en-IN
 SILENCE_DURATION_MS=1500
+
+# TTS provider chain for Stage 6
+TTS_PROVIDER_ORDER=sarvam,kokoro,piper,gtts
+
+# Stage 6 transcript policy
+STAGE6_TRANSCRIPT_FORMAT=both
+STAGE6_TRANSCRIPT_LANGUAGE_MODE=always_english
+
+# Keyword retention policy for technical terms
+TTS_KEYWORD_POLICY=keep_english
+TTS_PROTECTED_KEYWORDS=API,SDK,REST,JSON,GitHub,LLM,AI
+
+# Sarvam TTS defaults (optional overrides)
+SARVAM_TTS_URL=https://api.sarvam.ai/text-to-speech
+SARVAM_TTS_MODEL=bulbul:v3
+SARVAM_DEFAULT_SPEAKER=shubh
+SARVAM_DEFAULT_LANGUAGE=en-IN
+SARVAM_TTS_PACE=1.0
+SARVAM_TTS_SAMPLE_RATE=24000
+SARVAM_MAX_TEXT_CHARS=2400
 
 # Stage checkpoint reuse: 1 enabled (default), 0 disabled
 PIPELINE_USE_CACHE=1
@@ -230,6 +255,17 @@ Available Kokoro voice IDs:
 - `af_nova`
 
 Voice preview endpoint uses Kokoro first, then Piper, then gTTS fallback.
+
+Sarvam AI integration (multilingual):
+
+- Stage 6 voice selector now supports provider + language + voice choices.
+- Sarvam supports multilingual narration (including Indian languages) via `target_language_code`.
+- Recommended Stage 6 provider chain: `sarvam,kokoro,piper,gtts`.
+- If the selected provider is unavailable, fallback engines are used automatically.
+- For non-English requests, providers that do not support the selected language are auto-routed to Sarvam.
+- Stage 6 now generates transcript artifacts (`transcript_en.json` and `transcript_en.srt`) by default.
+- Transcript policy defaults to always English, independent of narration language.
+- Keyword retention can keep configured technical terms in English for multilingual narration (`TTS_KEYWORD_POLICY=keep_english`).
 
 ## Checkpoints, Cache, and Reruns
 

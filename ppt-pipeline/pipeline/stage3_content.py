@@ -11,7 +11,11 @@ from pipeline.config import get_ai_config
 
 load_dotenv()
 checkpoint_mgr = CheckpointManager()
-AI_CFG = get_ai_config()
+
+# Defer AI_CFG to a function so it is always resolved after .env is loaded,
+# avoiding the lru_cache stale-env hazard when modules are imported in varying order.
+def _get_ai_cfg():
+    return get_ai_config()
 
 WORDS_PER_MINUTE = 130
 MIN_DURATION_MINUTES = 7
@@ -19,31 +23,31 @@ MAX_DURATION_MINUTES = 10
 MIN_TOTAL_WORDS = MIN_DURATION_MINUTES * WORDS_PER_MINUTE
 MAX_TOTAL_WORDS = MAX_DURATION_MINUTES * WORDS_PER_MINUTE
 MIN_NOTE_WORDS_FLOOR = 45
-NOTES_POLICY_VERSION = 7
-TYPED_BLUEPRINT_VERSION = 7
+NOTES_POLICY_VERSION = 10
+TYPED_BLUEPRINT_VERSION = 10
 BULLET_CHARS = '●•·○◦▪▸►▶–—*-'
 STAGE3_ENABLE_VISION_ENRICHMENT = str(os.getenv('STAGE3_ENABLE_VISION_ENRICHMENT', '1')).strip().lower() in {'1', 'true', 'yes', 'on'}
 STAGE3_MAX_VISION_SLIDES = max(0, int(os.getenv('STAGE3_MAX_VISION_SLIDES', '1') or 1))
 STAGE3_MAX_REBALANCE_ATTEMPTS = max(0, int(os.getenv('STAGE3_MAX_REBALANCE_ATTEMPTS', '1') or 1))
 STAGE3_REBALANCE_MARGIN_WORDS = max(0, int(os.getenv('STAGE3_REBALANCE_MARGIN_WORDS', '80') or 80))
-_stage3_provider_default = ','.join(AI_CFG.get('provider_order', ['groq', 'gemini', 'openrouter']))
+_stage3_provider_default = ','.join(_get_ai_cfg().get('provider_order', ['groq', 'gemini', 'openrouter']))
 STAGE3_PROVIDER_ORDER = [
     p.strip().lower() for p in os.getenv('STAGE3_PROVIDER_ORDER', _stage3_provider_default).split(',') if p.strip()
 ]
 STAGE3_AI_TIMEOUT_SECONDS = max(
     5,
-    int(os.getenv('STAGE3_AI_TIMEOUT_SECONDS', str(AI_CFG.get('http', {}).get('timeout_seconds', 45))) or 45),
+    int(os.getenv('STAGE3_AI_TIMEOUT_SECONDS', str(_get_ai_cfg().get('http', {}).get('timeout_seconds', 45))) or 45),
 )
 STAGE3_AI_MAX_RETRIES = max(
     0,
-    int(os.getenv('STAGE3_AI_MAX_RETRIES', str(AI_CFG.get('http', {}).get('max_retries', 2))) or 2),
+    int(os.getenv('STAGE3_AI_MAX_RETRIES', str(_get_ai_cfg().get('http', {}).get('max_retries', 2))) or 2),
 )
 STAGE3_AI_RETRY_BACKOFF_SECONDS = max(
     0.0,
     float(
         os.getenv(
             'STAGE3_AI_RETRY_BACKOFF_SECONDS',
-            str(AI_CFG.get('http', {}).get('retry_backoff_seconds', 1.5)),
+            str(_get_ai_cfg().get('http', {}).get('retry_backoff_seconds', 1.5)),
         ) or 1.5
     ),
 )
@@ -1072,16 +1076,40 @@ def _classify_body_archetype(slide, bullets):
     raw = _clean_text(slide.get('raw_text', ''))
     wc = int(slide.get('word_count', 0) or 0)
     has_image = bool(slide.get('image_path'))
+    title = _clean_text(slide.get('title', '')).lower()
+
+    # Complex diagram threshold: if the source slide had many words, the image IS
+    # a rich infographic (multi-column, flow diagram, comparison table, etc.).
+    # Placing bullet text beside it causes overlap. Force diagram-only layout.
+    COMPLEX_DIAGRAM_WORD_THRESHOLD = 35
+
+    # Title-keyword heuristic: only truly unambiguous diagram words trigger this.
+    # 'architecture', 'framework', 'pipeline' are too broad and suppress content.
+    _DIAGRAM_TITLE_KEYWORDS = ('diagram', 'chart', 'flow chart', 'flowchart', 'graph', 'schematic')
+    title_is_diagram = any(kw in title for kw in _DIAGRAM_TITLE_KEYWORDS)
 
     if hint == 'image_only':
         return 'diagram'
 
     if hint == 'likely_diagram':
-        if bullets and len(bullets) >= 2:
+        if wc > COMPLEX_DIAGRAM_WORD_THRESHOLD:
+            # Complex infographic: too many words for side-by-side; use pure image slide
+            return 'diagram'
+        if title_is_diagram:
+            # Unambiguous diagram title and low text = pure image slide
+            return 'diagram'
+        if bullets and 2 <= len(bullets) <= 5:
+            # Source image + a few AI bullets: show both side by side
             return 'image_content'
         return 'diagram'
 
-    if has_image and (wc <= 24 or len(raw) <= 100) and bullets:
+    if title_is_diagram and has_image:
+        # Title explicitly says 'diagram/chart/etc' and has an image → diagram layout
+        return 'diagram'
+
+    # Plain slide with an image — only use image_content if source was sparse
+    # (icon/photo with a caption, not a diagram). Tight word-count cap.
+    if has_image and wc <= 20 and len(raw) <= 90 and bullets and len(bullets) <= 4:
         return 'image_content'
     return 'content'
 
@@ -1269,6 +1297,8 @@ def _build_diagram_context_bullets(slide, slides, toc, slide_bullets=None, max_i
 
 def _build_conclusion_bullets(body_entries):
     bullets = []
+    seen_normalised = set()  # deduplication: normalise whitespace + lowercase
+
     for entry in body_entries:
         entry_bullets = _normalize_bullet_lines(entry.get('bullets') or [], max_items=2)
         candidate = entry_bullets[0] if entry_bullets else ''
@@ -1281,6 +1311,19 @@ def _build_conclusion_bullets(body_entries):
                     candidate = f'Apply {title} in implementation and validation decisions.'
         if not candidate:
             continue
+
+        # Deduplicate: skip if we've already added an identical bullet
+        norm = re.sub(r'\s+', ' ', candidate).strip().lower()
+        if norm in seen_normalised:
+            # Try the second bullet from this entry instead
+            candidate = entry_bullets[1] if len(entry_bullets) > 1 else ''
+            if not candidate:
+                continue
+            norm = re.sub(r'\s+', ' ', candidate).strip().lower()
+            if norm in seen_normalised:
+                continue
+
+        seen_normalised.add(norm)
         bullets.append(candidate)
         if len(bullets) >= 5:
             break

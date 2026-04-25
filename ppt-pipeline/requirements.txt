@@ -2,6 +2,7 @@ flask
 python-pptx
 python-dotenv
 pdfplumber
+requests
 openai
 moviepy
 Pillow

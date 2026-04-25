@@ -328,8 +328,32 @@ Return available voices.
 ```json
 {
   "success": true,
+  "default_voice_id": "kokoro:af_heart",
+  "default_language_code": "en-IN",
+  "default_provider": "auto",
+  "default_transcript_format": "both",
+  "default_transcript_language_mode": "always_english",
+  "default_keyword_policy": "keep_english",
+  "default_protected_keywords": ["API", "SDK", "REST"],
+  "languages": {
+    "en-IN": "English (India)",
+    "hi-IN": "Hindi"
+  },
   "voices": {
-    "af_heart": {"name": "Heart (Female)", "gender": "Female"}
+    "kokoro:af_heart": {
+      "name": "Heart (Female)",
+      "gender": "Female",
+      "provider": "kokoro",
+      "voice": "af_heart",
+      "languages": ["en-IN"]
+    },
+    "sarvam:shubh": {
+      "name": "Shubh (Sarvam)",
+      "gender": "Unknown",
+      "provider": "sarvam",
+      "voice": "shubh",
+      "languages": ["en-IN", "hi-IN", "ta-IN"]
+    }
   }
 }
 ```
@@ -346,10 +370,18 @@ Request body:
 
 ```json
 {
-  "voice_id": "af_heart",
-  "text": "Optional custom preview text"
+  "voice_id": "sarvam:shubh",
+  "language_code": "hi-IN",
+  "provider": "sarvam",
+  "keyword_policy": "keep_english",
+  "protected_keywords": ["API", "SDK"]
 }
 ```
+
+Notes:
+
+- Preview text is fixed English copy by product policy.
+- For non-English preview requests with unsupported providers, routing auto-selects Sarvam.
 
 Success response:
 
@@ -357,10 +389,25 @@ Success response:
 {
   "success": true,
   "result": {
-    "voice_id": "af_heart",
-    "voice_name": "Heart (Female)",
-    "engine": "kokoro",
-    "preview_url": "/checkpoints/stage6_audio/previews/preview_af_heart.mp3"
+    "voice_id": "sarvam:shubh",
+    "voice_name": "Shubh (Sarvam)",
+    "provider_requested": "sarvam",
+    "provider_used": "sarvam",
+    "provider_chain": ["sarvam", "kokoro", "piper", "gtts"],
+    "provider_routing": {
+      "requested_provider": "sarvam",
+      "requested_language": "hi-IN",
+      "auto_routed": false,
+      "reason": "",
+      "effective_primary": "sarvam"
+    },
+    "language_code": "hi-IN",
+    "engine": "sarvam",
+    "preview_text_policy": "english_only_fixed",
+    "keyword_policy": "keep_english",
+    "protected_keywords": ["API", "SDK"],
+    "matched_keywords": ["API"],
+    "preview_url": "/checkpoints/stage6_audio/previews/preview_sarvam_shubh_hi-IN.mp3"
   }
 }
 ```
@@ -378,7 +425,13 @@ Request body (optional):
 
 ```json
 {
-  "voice": "af_heart"
+  "voice": "sarvam:shubh",
+  "language_code": "ta-IN",
+  "provider": "sarvam",
+  "transcript_format": "both",
+  "transcript_language_mode": "always_english",
+  "keyword_policy": "keep_english",
+  "protected_keywords": ["API", "SDK", "REST"]
 }
 ```
 
@@ -389,18 +442,47 @@ Success response:
   "success": true,
   "result": {
     "filename": "notheme",
-    "voice_id": "af_heart",
-    "voice": "Heart (Female)",
+    "voice_id": "sarvam:shubh",
+    "voice": "Shubh (Sarvam)",
+    "language_code": "ta-IN",
+    "provider_requested": "sarvam",
+    "provider_used": "sarvam",
+    "provider_chain": ["sarvam", "kokoro", "piper", "gtts"],
+    "provider_routing": {
+      "requested_provider": "sarvam",
+      "requested_language": "ta-IN",
+      "auto_routed": false,
+      "reason": "",
+      "effective_primary": "sarvam"
+    },
     "slide_count": 14,
     "total_words": 1102,
     "output_dir": ".../checkpoints/stage6_audio/notheme",
     "audio_files": [],
+    "transcript_formats": ["json", "srt"],
+    "transcript_language_mode": "always_english",
+    "transcripts": {
+      "language_mode": "always_english",
+      "transcript_language_code": "en-IN",
+      "narration_language_code": "ta-IN",
+      "formats": ["json", "srt"],
+      "files": {
+        "json": ".../checkpoints/stage6_audio/notheme/transcript_en.json",
+        "srt": ".../checkpoints/stage6_audio/notheme/transcript_en.srt"
+      },
+      "segments": 14,
+      "protected_keywords": ["API", "SDK", "REST"],
+      "matched_keywords": ["API"]
+    },
+    "keyword_policy": "keep_english",
+    "protected_keywords": ["API", "SDK", "REST"],
+    "matched_keywords": ["API"],
     "engine_summary": {
-      "kokoro": 12,
+      "sarvam": 12,
       "gtts": 1,
       "silence": 1
     },
-    "primary_engine": "kokoro",
+    "primary_engine": "sarvam",
     "fallback_used": true
   }
 }

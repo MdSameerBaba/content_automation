@@ -139,22 +139,38 @@ If Stage 5 fails:
 
 Engine order for each slide note:
 
-1. Kokoro
-2. Piper
-3. gTTS
-4. Silence fallback
+1. Sarvam (multilingual-capable)
+2. Kokoro (English)
+3. Piper (English)
+4. gTTS (English)
+5. Silence fallback
+
+Routing note:
+
+- For non-English language requests, unsupported providers are auto-routed to Sarvam.
 
 What to monitor in Stage 6 result:
 
 - `engine_summary`
 - `fallback_used`
 - `primary_engine`
+- `provider_routing`
+- `transcripts.files`
+- `transcript_language_mode`
+- `matched_keywords`
 
 If too many silence outputs:
 
 1. Confirm Python 3.12 runtime
-2. Confirm Kokoro dependencies are installed
-3. Verify internet access for fallback providers when needed
+2. Confirm `SARVAM_API_KEY` is configured and valid
+3. Confirm Kokoro dependencies are installed
+4. Verify internet access for TTS providers when needed
+
+Transcript policy checks:
+
+1. Verify `transcript_en.json` and `transcript_en.srt` exist in Stage 6 output directory.
+2. Verify transcript language mode is `always_english` for multilingual narration runs.
+3. Verify protected technical terms remain English in transcript (`matched_keywords`).
 
 ## 8) Stage 7 Video Reliability
 
@@ -195,5 +211,7 @@ Before marking a run successful:
 3. Stage 4 PPTX opens cleanly and key slides are populated.
 4. Stage 5 slide count equals Stage 4 total slides.
 5. Stage 6 engine summary shows expected speech coverage.
-6. Stage 7 duration is plausible for total narration words.
-7. Downloaded MP4 and PPTX files are readable.
+6. Stage 6 transcript artifacts (`transcript_en.json`, `transcript_en.srt`) are generated.
+7. Stage 6 provider routing matches requested language expectations.
+8. Stage 7 duration is plausible for total narration words.
+9. Downloaded MP4 and PPTX files are readable.

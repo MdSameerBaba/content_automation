@@ -703,6 +703,36 @@
       color: #f59e0b;
       margin-bottom: 10px;
     }
+
+    .voice-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .voice-control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 180px;
+    }
+
+    .voice-control label {
+      font-size: 0.72rem;
+      color: #a0aec0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .voice-control select {
+      background: rgba(15, 18, 37, 0.7);
+      border: 1px solid rgba(121, 134, 203, 0.45);
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -790,14 +820,34 @@
 
   <!-- Voice Selection -->
   <div id="voiceSelector" class="voice-selector" style="display:none;">
-    <h3>🎤 Select Voice</h3>
-    <p class="voice-desc">Preview and choose your preferred voice for narration</p>
+    <h3>🎤 Audio Narration Settings</h3>
+    <p class="voice-desc">Choose the language, provider, and voice. Speaker notes are <strong>translated</strong> into the selected language before being spoken — technical keywords stay in English.</p>
+
+    <!-- ── Step 1: Language (most important setting) ── -->
+    <div style="background:rgba(121,134,203,0.1);border-left:3px solid #7986cb;border-radius:8px;padding:14px 18px;margin-bottom:20px;">
+      <div style="font-size:0.68rem;font-weight:700;color:#7986cb;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">① Narration Language</div>
+      <div style="font-size:0.8rem;color:#a0aec0;margin-bottom:10px;">Select the language your audience will hear. English speaker notes will be translated automatically.</div>
+      <select id="voiceLanguageSelect" style="background:rgba(15,18,37,0.9);border:1px solid rgba(121,134,203,0.5);border-radius:8px;color:#e2e8f0;padding:10px 14px;font-size:0.92rem;font-weight:600;width:100%;max-width:340px;cursor:pointer;"></select>
+    </div>
+
+    <!-- ── Step 2: Provider & Voice ── -->
+    <div style="font-size:0.68rem;font-weight:700;color:#7986cb;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;">② Provider &amp; Voice</div>
+    <div class="voice-controls">
+      <div class="voice-control">
+        <label for="voiceProviderSelect">Provider</label>
+        <select id="voiceProviderSelect">
+          <option value="auto">Auto (best available)</option>
+          <option value="sarvam">Sarvam AI</option>
+          <option value="kokoro">Kokoro</option>
+        </select>
+      </div>
+    </div>
     <div id="voiceList" class="voice-list"></div>
     <div class="voice-selected" id="voiceSelected">
       Selected: <span id="selectedVoiceName">Heart (Female)</span>
     </div>
     <div class="voice-selected" id="previewEngineInfo" style="display:none;"></div>
-    <button class="btn-primary" onclick="confirmVoice()">Confirm & Generate Audio</button>
+    <button class="btn-primary" onclick="confirmVoice()">Confirm &amp; Generate Audio</button>
   </div>
 
   <!-- Human Review Gate: shown after Stage 4 completes -->
@@ -935,18 +985,18 @@
     }
 
     const normalized = String(engine).toUpperCase();
-    const showFallbackStyle = fallbackUsed || normalized !== 'KOKORO';
+    const showFallbackStyle = Boolean(fallbackUsed);
     badge.style.display = 'inline-block';
     badge.textContent = normalized;
     badge.classList.toggle('fallback', showFallbackStyle);
     badge.title = showFallbackStyle
-      ? `Primary audio engine: ${normalized} (fallback used or non-Kokoro output)`
+      ? `Primary audio engine: ${normalized} (fallback used)`
       : `Primary audio engine: ${normalized}`;
   }
 
   function applyAudioEngineFromPayload(payload) {
     const primary = payload?.primary_engine || derivePrimaryEngineFromSummary(payload?.engine_summary) || 'unknown';
-    const fallbackUsed = Boolean(payload?.fallback_used) || String(primary).toLowerCase() !== 'kokoro';
+    const fallbackUsed = Boolean(payload?.fallback_used);
     currentAudioEngine = primary;
     currentAudioFallbackUsed = fallbackUsed;
     setAudioEngineBadge(primary, fallbackUsed);
@@ -1038,30 +1088,77 @@
   }
 
   /* ── Voice Selection ── */
-  let selectedVoice = 'af_heart';
+  let selectedVoice = 'kokoro:af_heart';
+  let selectedLanguage = 'en-IN';
+  let selectedProvider = 'auto';
+  let selectedTranscriptFormat = 'both';
+  let selectedTranscriptLanguageMode = 'always_english';
+  let selectedKeywordPolicy = 'keep_english';
+  let selectedProtectedKeywords = [];
   let voices = {};
+  let languages = {};
 
   async function showVoiceSelector() {
     try {
       const res = await fetch('/voices');
       const data = await res.json();
-      voices = data.voices;
-      
-      const container = document.getElementById('voiceList');
-      container.innerHTML = '';
-      
-      for (const [vid, vinfo] of Object.entries(voices)) {
-        const div = document.createElement('div');
-        div.className = 'voice-item' + (vid === selectedVoice ? ' selected' : '');
-        div.id = 'voice-' + vid;
-        div.onclick = () => selectVoice(vid);
-        div.innerHTML = `
-          <div class="voice-name">${vinfo.name}</div>
-          <div class="voice-gender">${vinfo.gender}</div>
-          <button class="voice-preview-btn" id="preview-${vid}" onclick="event.stopPropagation(); playPreview('${vid}')">▶ Preview</button>
-        `;
-        container.appendChild(div);
+      voices = data.voices || {};
+      languages = data.languages || {};
+
+      if (data.default_voice_id && voices[data.default_voice_id]) {
+        selectedVoice = data.default_voice_id;
       }
+      if (data.default_language_code && languages[data.default_language_code]) {
+        selectedLanguage = data.default_language_code;
+      }
+      if (data.default_provider) {
+        selectedProvider = data.default_provider;
+      }
+      if (data.default_transcript_format) {
+        selectedTranscriptFormat = data.default_transcript_format;
+      }
+      if (data.default_transcript_language_mode) {
+        selectedTranscriptLanguageMode = data.default_transcript_language_mode;
+      }
+      if (data.default_keyword_policy) {
+        selectedKeywordPolicy = data.default_keyword_policy;
+      }
+      if (Array.isArray(data.default_protected_keywords)) {
+        selectedProtectedKeywords = data.default_protected_keywords;
+      }
+
+      const providerSelect = document.getElementById('voiceProviderSelect');
+      const languageSelect = document.getElementById('voiceLanguageSelect');
+
+      if (providerSelect) {
+        providerSelect.value = ['auto', 'sarvam', 'kokoro'].includes(selectedProvider) ? selectedProvider : 'auto';
+        providerSelect.onchange = () => {
+          selectedProvider = providerSelect.value || 'auto';
+          renderVoiceList();
+        };
+      }
+
+      if (languageSelect) {
+        languageSelect.innerHTML = '';
+        Object.entries(languages).forEach(([code, label]) => {
+          const opt = document.createElement('option');
+          opt.value = code;
+          opt.textContent = `${label} (${code})`;
+          languageSelect.appendChild(opt);
+        });
+        if (languages[selectedLanguage]) {
+          languageSelect.value = selectedLanguage;
+        }
+        languageSelect.onchange = () => {
+          selectedLanguage = languageSelect.value || 'en-IN';
+          // Re-render so incompatible voices are hidden and a valid one is auto-selected.
+          renderVoiceList();
+          // Show a notice if user picks a non-English language.
+          _updateLanguageNotice(selectedLanguage);
+        };
+      }
+      
+      renderVoiceList();
       
       document.getElementById('voiceSelector').style.display = 'block';
     } catch (e) {
@@ -1069,16 +1166,89 @@
     }
   }
 
+  function _updateLanguageNotice(langCode) {
+    let notice = document.getElementById('langNotice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'langNotice';
+      notice.style.cssText = 'font-size:0.8rem;color:#f6ad55;background:rgba(246,173,85,0.1);border:1px solid rgba(246,173,85,0.3);border-radius:6px;padding:8px 12px;margin-bottom:10px;';
+      const voiceSelector = document.getElementById('voiceSelector');
+      const confirmBtn = voiceSelector.querySelector('.btn-primary');
+      if (confirmBtn) voiceSelector.insertBefore(notice, confirmBtn);
+    }
+    const isNonEnglish = langCode && langCode !== 'en-IN';
+    if (isNonEnglish) {
+      notice.style.display = 'block';
+      notice.innerHTML = `⚠️ <strong>Non-English language selected (${langCode})</strong>: Only Sarvam AI voices support this language. Voice preview always plays in English — actual narration will be generated in the chosen language via Sarvam.`;
+    } else {
+      notice.style.display = 'none';
+    }
+  }
+
+  function renderVoiceList() {
+    const container = document.getElementById('voiceList');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const entries = Object.entries(voices);
+    const filtered = entries.filter(([, vinfo]) => {
+      if (!vinfo) return false;
+      if (selectedProvider && selectedProvider !== 'auto' && vinfo.provider !== selectedProvider) {
+        return false;
+      }
+      const supported = Array.isArray(vinfo.languages) ? vinfo.languages : [];
+      if (supported.length > 0 && !supported.includes(selectedLanguage)) {
+        return false;
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="voice-selected">No voices available for the selected provider/language.</div>';
+      return;
+    }
+
+    // Auto-select the first compatible voice when the current one is not in the filtered list.
+    if (!filtered.find(([vid]) => vid === selectedVoice)) {
+      selectedVoice = filtered[0][0];
+      // Update the displayed name immediately.
+      const meta = voices[selectedVoice] || {};
+      const nameEl = document.getElementById('selectedVoiceName');
+      if (nameEl) nameEl.textContent = meta.name || selectedVoice;
+    }
+
+    filtered.forEach(([vid, vinfo]) => {
+      const safeId = vid.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const div = document.createElement('div');
+      div.className = 'voice-item' + (vid === selectedVoice ? ' selected' : '');
+      div.id = 'voice-' + safeId;
+      div.onclick = () => selectVoice(vid);
+      div.innerHTML = `
+        <div class="voice-name">${vinfo.name}</div>
+        <div class="voice-gender">${vinfo.gender || 'Unknown'} · ${(vinfo.provider || 'unknown').toUpperCase()}</div>
+        <button class="voice-preview-btn" id="preview-${safeId}" onclick="event.stopPropagation(); playPreview('${vid}')">▶ Preview</button>
+      `;
+      container.appendChild(div);
+    });
+
+    const selectedMeta = voices[selectedVoice] || {};
+    document.getElementById('selectedVoiceName').textContent = selectedMeta.name || selectedVoice;
+  }
+
   function selectVoice(vid) {
     selectedVoice = vid;
     document.querySelectorAll('.voice-item').forEach(el => el.classList.remove('selected'));
-    document.getElementById('voice-' + vid).classList.add('selected');
-    document.getElementById('selectedVoiceName').textContent = voices[vid].name;
+    const safeId = vid.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const selectedEl = document.getElementById('voice-' + safeId);
+    if (selectedEl) selectedEl.classList.add('selected');
+    document.getElementById('selectedVoiceName').textContent = (voices[vid] && voices[vid].name) || vid;
   }
 
   async function playPreview(vid) {
-    const btn = document.getElementById('preview-' + vid);
+    const safeId = vid.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const btn = document.getElementById('preview-' + safeId);
     const info = document.getElementById('previewEngineInfo');
+    if (!btn) return;
     btn.disabled = true;
     btn.textContent = '⏳ Generating...';
     
@@ -1086,13 +1256,22 @@
       const res = await fetch('/voices/preview', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({voice_id: vid})
+        body: JSON.stringify({
+          voice_id: vid,
+          language_code: selectedLanguage,
+          provider: selectedProvider === 'auto' ? null : selectedProvider,
+          keyword_policy: selectedKeywordPolicy,
+          protected_keywords: selectedProtectedKeywords,
+        })
       });
       const data = await res.json();
       
       if (data.success && data.result.preview_url) {
         const engine = (data.result.engine || 'unknown').toUpperCase();
-        let message = `Preview engine: ${engine}`;
+        const reqProvider = (data.result.provider_requested || 'auto').toUpperCase();
+        const usedProvider = (data.result.provider_used || data.result.engine || 'unknown').toUpperCase();
+        const lang = data.result.language_code || selectedLanguage;
+        let message = `Preview ${lang} • requested ${reqProvider} • used ${usedProvider} • engine ${engine}`;
         if (data.result.warning) {
           message += ` • ${data.result.warning}`;
         }
@@ -1123,7 +1302,16 @@
 
   function confirmVoice() {
     document.getElementById('voiceSelector').style.display = 'none';
-    runStageWithVoice('audio', selectedVoice);
+    runStageWithVoice(
+      'audio',
+      selectedVoice,
+      false,
+      null,
+      {
+        language_code: selectedLanguage,
+        provider: selectedProvider === 'auto' ? null : selectedProvider,
+      }
+    );
   }
 
   /* ── Run a pipeline stage ── */
@@ -1163,7 +1351,7 @@
     runStageWithVoice(stage, null, false, null);
   }
 
-  function runStageWithVoice(stage, voice, forceVideo = false, splitOptions = null) {
+  function runStageWithVoice(stage, voice, forceVideo = false, splitOptions = null, audioOptions = null) {
     if (!currentFilename || activeStage) return;
 
     const cfg = STAGE_MAP[stage];
@@ -1189,9 +1377,17 @@
     showStatus(labels[stage] || 'Running…');
 
     const fetchOptions = { method: 'POST' };
-    if (voice) {
+    if (stage === 'audio') {
       fetchOptions.headers = {'Content-Type': 'application/json'};
-      fetchOptions.body = JSON.stringify({voice: voice});
+      fetchOptions.body = JSON.stringify({
+        voice: voice,
+        language_code: audioOptions?.language_code || selectedLanguage,
+        provider: audioOptions?.provider || null,
+        transcript_format: selectedTranscriptFormat,
+        transcript_language_mode: selectedTranscriptLanguageMode,
+        keyword_policy: selectedKeywordPolicy,
+        protected_keywords: selectedProtectedKeywords,
+      });
     } else if (stage === 'video' && forceVideo) {
       fetchOptions.headers = {'Content-Type': 'application/json'};
       fetchOptions.body = JSON.stringify({force: true});
@@ -1453,10 +1649,18 @@
         ['Slides exported', r.slide_count || '—'],
       ];
     } else if (stage === 'audio') {
+      const transcriptFormats = Array.isArray(r.transcript_formats) ? r.transcript_formats.join(', ') : '—';
+      const transcriptFiles = r.transcripts?.files ? Object.keys(r.transcripts.files).join(', ') : '—';
       rows = [
         ['Audio files', r.slide_count || '—'],
         ['Total words', r.total_words || '—'],
         ['Voice', r.voice || '—'],
+        ['Language', r.language_code || '—'],
+        ['Provider', r.provider_used || r.provider_requested || '—'],
+        ['Transcript mode', r.transcript_language_mode || '—'],
+        ['Transcript formats', transcriptFormats],
+        ['Transcript files', transcriptFiles],
+        ['Keyword policy', r.keyword_policy || '—'],
         ['Engine summary', formatEngineSummary(r.engine_summary)],
       ];
     } else if (stage === 'video') {
@@ -1489,7 +1693,11 @@
     if (stage === 'images') return `${r.slide_count} images exported`;
     if (stage === 'audio') {
       const engine = r.primary_engine ? ` (${r.primary_engine})` : '';
-      return `${r.slide_count} audio files generated${engine}`;
+      const lang = r.language_code ? `, ${r.language_code}` : '';
+      const transcript = Array.isArray(r.transcript_formats) && r.transcript_formats.length
+        ? `, transcript: ${r.transcript_formats.join('+')}`
+        : '';
+      return `${r.slide_count} audio files generated${engine}${lang}${transcript}`;
     }
     if (stage === 'video') return `Video ready (${r.total_duration_seconds}s)`;
     return 'Complete';

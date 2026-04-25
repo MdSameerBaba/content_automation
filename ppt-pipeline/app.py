@@ -208,8 +208,29 @@ def run_images(filename):
 @app.route('/voices', methods=['GET'])
 def get_voices():
     try:
-        from pipeline.stage6_audio import get_voices, KOKORO_VOICES
-        return jsonify({'success': True, 'voices': KOKORO_VOICES})
+        from pipeline.stage6_audio import (
+            get_voice_catalog,
+            get_language_catalog,
+            get_default_voice_id,
+            get_default_language_code,
+            get_default_provider,
+            get_default_transcript_format,
+            get_default_transcript_language_mode,
+            get_default_keyword_policy,
+            get_default_protected_keywords,
+        )
+        return jsonify({
+            'success': True,
+            'voices': get_voice_catalog(),
+            'languages': get_language_catalog(),
+            'default_voice_id': get_default_voice_id(),
+            'default_language_code': get_default_language_code(),
+            'default_provider': get_default_provider(),
+            'default_transcript_format': get_default_transcript_format(),
+            'default_transcript_language_mode': get_default_transcript_language_mode(),
+            'default_keyword_policy': get_default_keyword_policy(),
+            'default_protected_keywords': get_default_protected_keywords(),
+        })
     except Exception as e:
         return error_response('VOICE_LIST_FAILED', str(e), include_trace=True)
 
@@ -220,9 +241,20 @@ def preview_voice():
         data = request.get_json() or {}
         voice_id = data.get('voice_id')
         custom_text = data.get('text')
+        language_code = data.get('language_code')
+        provider = data.get('provider')
+        keyword_policy = data.get('keyword_policy')
+        protected_keywords = data.get('protected_keywords')
         
         from pipeline.stage6_audio import generate_preview
-        result = generate_preview(voice_id, custom_text)
+        result = generate_preview(
+            voice_id=voice_id,
+            preview_text=custom_text,
+            language_code=language_code,
+            provider=provider,
+            keyword_policy=keyword_policy,
+            protected_keywords=protected_keywords,
+        )
         
         if 'error' in result:
             return error_response('VOICE_PREVIEW_FAILED', result['error'], status=400)
@@ -238,8 +270,23 @@ def run_audio(filename):
     try:
         from pipeline.stage6_audio import generate_audio
         data = request.get_json() or {}
-        voice = data.get('voice')  # Get selected voice
-        result = generate_audio(filename, voice=voice)
+        voice = data.get('voice')
+        language_code = data.get('language_code')
+        provider = data.get('provider')
+        transcript_format = data.get('transcript_format')
+        transcript_language_mode = data.get('transcript_language_mode')
+        keyword_policy = data.get('keyword_policy')
+        protected_keywords = data.get('protected_keywords')
+        result = generate_audio(
+            filename,
+            voice=voice,
+            language_code=language_code,
+            provider=provider,
+            transcript_format=transcript_format,
+            transcript_language_mode=transcript_language_mode,
+            keyword_policy=keyword_policy,
+            protected_keywords=protected_keywords,
+        )
         return jsonify({'success': True, 'result': result})
     except ImportError:
         return error_response('STAGE6_NOT_AVAILABLE', 'stage6_audio.py not created yet', status=501)
@@ -264,9 +311,9 @@ def run_video(filename):
 
 if __name__ == '__main__':
     required = (3, 12)
-    if sys.version_info[:2] != required:
+    if sys.version_info[:2] < required:
         raise SystemExit(
-            f'This app is locked to Python {required[0]}.{required[1]} for Kokoro compatibility. '
+            f'This app requires Python {required[0]}.{required[1]}+ for Kokoro compatibility. '
             'Use the .venv312 environment to run app.py.'
         )
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)

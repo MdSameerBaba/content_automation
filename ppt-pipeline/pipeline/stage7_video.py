@@ -50,7 +50,12 @@ def _is_cached_video_valid(filename, cached):
 def _get_audio_duration(audio_path):
     """Get duration of an MP3 file in seconds."""
     try:
-        from moviepy.audio.io.AudioFileClip import AudioFileClip
+        try:
+            # MoviePy v2.x
+            from moviepy import AudioFileClip
+        except ImportError:
+            # MoviePy v1.x fallback
+            from moviepy.audio.io.AudioFileClip import AudioFileClip
         clip = AudioFileClip(audio_path)
         duration = clip.duration
         clip.close()
@@ -148,35 +153,42 @@ def create_video(filename, force=False):
             _run_ffmpeg(cmd, f'slide {slide_num} silent render')
             slide_clips.append(slide_clip_path)
     
-    # Concatenate all slide videos
+    # Concatenate all slide videos.
+    # Re-encode (not stream-copy) so mixed audio/silent clips are compatible.
     concat_list_path = os.path.join(OUTPUT_DIR, 'concat_list.txt')
     with open(concat_list_path, 'w') as f:
         for clip_path in slide_clips:
             f.write(f"file '{clip_path}'\n")
-    
+
     cmd = [
         FFMPEG_PATH, '-y',
         '-f', 'concat',
         '-safe', '0',
         '-i', concat_list_path,
-        '-c', 'copy',
+        '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-b:a', '128k',
+        '-movflags', '+faststart',
         out_path
     ]
-    
+
     print(f'  Concatenating {len(slide_clips)} slides...')
     try:
         _run_ffmpeg(cmd, 'final video concat')
     except Exception as concat_err:
-        print(f'FFmpeg concat warning: {concat_err}')
-        # Fallback: copy first video
-        if slide_clips:
-            import shutil
+        print(f'FFmpeg concat error: {concat_err}')
+        # Clean up temp clips before re-raising so we don't leave disk clutter.
+        for _cp in slide_clips:
+            if os.path.exists(_cp):
+                try:
+                    os.remove(_cp)
+                except OSError:
+                    pass
+        if os.path.exists(concat_list_path):
             try:
-                shutil.copy(slide_clips[0], out_path)
-            except Exception as copy_err:
-                raise RuntimeError(f'Final concat and fallback copy both failed: {copy_err}') from copy_err
-        else:
-            raise RuntimeError('Final concat failed and no slide clips were available for fallback copy.')
+                os.remove(concat_list_path)
+            except OSError:
+                pass
+        raise RuntimeError(f'Final video concat failed: {concat_err}') from concat_err
     
     # Cleanup temp files
     try:

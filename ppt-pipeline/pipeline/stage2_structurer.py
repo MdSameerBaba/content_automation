@@ -536,11 +536,16 @@ IMPORTANT: All {total} slides must be assigned. Start response with {{ and end w
             struct['unassigned_slides'] = missing
 
         # Remove any empty groups and enrich with Stage 1-derived metadata.
-        struct['groups'] = _enrich_groups(normalized_groups, slide_lookup)
-        struct['toc'] = [g['section_title'] for g in struct['groups']]
+        enriched_groups = _enrich_groups(normalized_groups, slide_lookup)
+        struct['groups'] = enriched_groups
+        struct['toc'] = [g['section_title'] for g in enriched_groups]
         base_struct = struct
 
-    enriched_groups = _enrich_groups(base_struct.get('groups', []), slide_lookup)
+    # Groups are already enriched via the AI path above.
+    # For the cache-fallback / deterministic path they were enriched inside the
+    # `if base_struct is not None` block that returned early, so we never reach here.
+    # This final block only runs from the AI-parsed path; reuse the already-enriched groups.
+    enriched_groups = base_struct.get('groups', [])
 
     split_plan = _build_split_plan(
         enriched_groups,
