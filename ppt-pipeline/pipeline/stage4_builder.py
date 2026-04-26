@@ -161,6 +161,19 @@ def _set_ph_bullets(slide, idx, lines):
     return False
 
 
+def _resolve_body_placeholder_idx(slide, slide_type):
+    """
+    Resolve the body placeholder index based on slide type.
+    Returns the placeholder index to use for body content.
+    """
+    body_indices = [1, 2]
+    for idx in body_indices:
+        for ph in slide.placeholders:
+            if ph.placeholder_format.idx == idx:
+                return idx
+    return None
+
+
 def _set_notes(slide, text):
     if not text:
         return
