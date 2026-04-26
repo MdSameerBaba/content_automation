@@ -1,6 +1,8 @@
 import os
 import sys
 import traceback
+import flask
+
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from pipeline.stage1_parser import parse_pdf
 from pipeline.checkpoint import CheckpointManager
