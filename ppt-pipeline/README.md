@@ -58,7 +58,7 @@ Use this sequence on a fresh machine.
 4. Start the app from inside `ppt-pipeline/`.
 
 ```powershell
-# 1) from workspace root (example)
+# 1) from workspace root (parent of ppt-pipeline)
 cd C:\Users\mdsam\content_auto
 
 # 2) create and activate venv (use py launcher or python directly)
@@ -74,6 +74,16 @@ cd .\ppt-pipeline
 .\start_app.ps1
 ```
 
+If you are ALREADY inside ppt-pipeline folder, activate from parent:
+
+```powershell
+# From INSIDE ppt-pipeline folder:
+cd ..
+& .\.venv312\Scripts\Activate.ps1
+cd ppt-pipeline
+.\start_app.ps1
+```
+
 App URL: `http://localhost:5000`
 
 ## Quick Start
@@ -81,10 +91,16 @@ App URL: `http://localhost:5000`
 ### 1) Create and activate Python 3.12 environment
 
 ```powershell
-# Run from workspace root (parent of ppt-pipeline)
+# If you are at workspace ROOT (parent of ppt-pipeline):
+cd C:\Users\mdsam\content_auto
 py -3.12.0 -m venv .venv312
 # OR: python -m venv .venv312
 & .\.venv312\Scripts\Activate.ps1
+
+# If you are ALREADY INSIDE ppt-pipeline folder:
+cd ..
+& .\.venv312\Scripts\Activate.ps1
+cd ppt-pipeline
 ```
 
 ### 2) Install dependencies
