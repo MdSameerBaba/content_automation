@@ -61,9 +61,8 @@ Use this sequence on a fresh machine.
 # 1) from workspace root (parent of ppt-pipeline)
 cd C:\Users\mdsam\content_auto
 
-# 2) create and activate venv (use py launcher or python directly)
-py -3.12.0 -m venv .venv312
-# OR: python -m venv .venv312
+# 2) create and activate venv (use python directly since py launcher may vary)
+python -m venv .venv312
 & .\.venv312\Scripts\Activate.ps1
 
 # 3) install dependencies for this app
@@ -93,8 +92,7 @@ App URL: `http://localhost:5000`
 ```powershell
 # If you are at workspace ROOT (parent of ppt-pipeline):
 cd C:\Users\mdsam\content_auto
-py -3.12.0 -m venv .venv312
-# OR: python -m venv .venv312
+python -m venv .venv312
 & .\.venv312\Scripts\Activate.ps1
 
 # If you are ALREADY INSIDE ppt-pipeline folder:
