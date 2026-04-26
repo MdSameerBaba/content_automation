@@ -12,3 +12,4 @@ imageio-ffmpeg
 numpy
 soundfile
 gtts
+comtypes
