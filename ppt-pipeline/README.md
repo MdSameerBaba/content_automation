@@ -89,6 +89,8 @@ App URL: `http://localhost:5000`
 
 ### 1) Create and activate Python 3.12 environment
 
+**Important:** This project requires Python 3.12.
+
 ```powershell
 # If you are at workspace ROOT (parent of ppt-pipeline):
 cd C:\Users\mdsam\content_auto
@@ -100,6 +102,11 @@ cd ..
 & .\.venv312\Scripts\Activate.ps1
 cd ppt-pipeline
 ```
+
+If you get "Invalid interpreter" or can't activate:
+1. Check you have Python 3.12 installed: `python -V`
+2. If not, download from https://www.python.org/downloads/ (look for Python 3.12.x)
+3. During install, check "Add Python to PATH"
 
 ### 2) Install dependencies
 
